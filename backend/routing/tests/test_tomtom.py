@@ -1,32 +1,9 @@
-from typing import Any
-
 import pytest
 import requests
 
 from routing.services.tomtom import TomTomClient, TomTomError
 
-
-class FakeResponse:
-    def __init__(self, status_code: int = 200, body: dict[str, Any] | None = None) -> None:
-        self.status_code = status_code
-        self.ok = status_code < 400
-        self.reason = "Bad Request"
-        self._body = body if body is not None else {}
-
-    def json(self) -> dict[str, Any]:
-        return self._body
-
-
-class FakeSession:
-    def __init__(self, response: FakeResponse | Exception) -> None:
-        self._response = response
-        self.requests: list[dict[str, Any]] = []
-
-    def get(self, url: str, params: dict[str, Any], timeout: float) -> FakeResponse:
-        self.requests.append({"url": url, "params": params, "timeout": timeout})
-        if isinstance(self._response, Exception):
-            raise self._response
-        return self._response
+from .fakes import FakeResponse, FakeSession
 
 
 def test_get_json_sends_key_and_params_with_a_15_second_timeout() -> None:

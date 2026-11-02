@@ -23,6 +23,17 @@ One line per non-obvious decision.
 - Geocoding and suggestions are limited to the US and Canada, and a suggestion request with a blank query returns nothing without calling the API.
 - The test fixtures follow TomTom's documented calculateRoute response shape but were generated, not recorded from the live API; `try_route` is the check against the real one.
 
+## Weather
+
+- Points are rounded to 2 decimals (about 1 km, finer than Open-Meteo's grid) and deduplicated before the request, so nearby checkpoints share one forecast.
+- Rain and showers are summed into one in/hr rate; if only one of them is present it is used alone, and if both are missing the hour stays missing (the risk engine then counts it as 0 and adds "missing data").
+- `snowfall` is used as reported with `precipitation_unit=inch`, which is snow depth, not water equivalent; the snow thresholds apply to it directly.
+- The start is floored and the end is ceiled to whole hours so the nearest-hour lookup always has both neighbours of an ETA.
+- `weather_at` rounds exactly half past the hour up, and raises `ForecastRangeError` for an ETA more than half an hour outside the series instead of silently reusing the edge hour.
+- The forecast horizon is from 00:00 UTC today to 16 days after that; a window that leaves it is rejected before any request is made.
+- Results are cached per point and hour range for 30 minutes in Django's local-memory cache, which is per process, so each gunicorn worker has its own copy.
+- Batches of up to 100 points run on at most 4 threads; a 429 or 5xx response is retried once after 0.5 s, other errors are not retried.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).

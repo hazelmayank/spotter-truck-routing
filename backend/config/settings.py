@@ -53,6 +53,8 @@ REST_FRAMEWORK = {
     "UNAUTHENTICATED_USER": None,
 }
 
+CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
+
 TIME_ZONE = "UTC"
 USE_TZ = True
 
