@@ -1,21 +1,17 @@
 from datetime import UTC, datetime, timedelta
-from math import radians
+from itertools import pairwise
 
 import pytest
 
-from routing.services.geo import EARTH_RADIUS_MILES, cumulative_distances
-from routing.services.sampling import build_checkpoints
+from routing.services.geo import cumulative_distances
+from routing.services.sampling import Checkpoint, build_checkpoints
 
-MILES_PER_DEGREE = EARTH_RADIUS_MILES * radians(1)  # one degree on a great circle
+from .lines import equator_line
+
 DEPARTURE = datetime(2026, 11, 3, 8, 0, tzinfo=UTC)
 
 
-def equator_line(miles: float, points: int = 21) -> list[tuple[float, float]]:
-    degrees = miles / MILES_PER_DEGREE
-    return [(0.0, degrees * i / (points - 1)) for i in range(points)]
-
-
-def elapsed_seconds(checkpoint) -> float:
+def elapsed_seconds(checkpoint: Checkpoint) -> float:
     return (checkpoint.eta_utc - DEPARTURE).total_seconds()
 
 
@@ -76,7 +72,7 @@ def test_each_segment_is_distance_since_previous_checkpoint() -> None:
 
     checkpoints = build_checkpoints(coords, 25, DEPARTURE, uniform_time_points(105, 6300))
 
-    for previous, current in zip(checkpoints, checkpoints[1:], strict=False):
+    for previous, current in pairwise(checkpoints):
         assert current.segment_miles == pytest.approx(current.mile - previous.mile)
 
 

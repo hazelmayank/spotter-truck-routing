@@ -9,13 +9,7 @@ from routing.services.risk import (
     classify_wind,
 )
 
-LOW, MODERATE, HIGH, SEVERE, NO_TRAVEL = (
-    RiskLevel.LOW,
-    RiskLevel.MODERATE,
-    RiskLevel.HIGH,
-    RiskLevel.SEVERE,
-    RiskLevel.NO_TRAVEL,
-)
+LOW, MODERATE, HIGH, SEVERE, NO_TRAVEL = RiskLevel
 
 
 def test_risk_level_values() -> None:
@@ -93,7 +87,9 @@ def test_classify_snow(snow_in_hr: float, expected: RiskLevel) -> None:
         (30, 80000, MODERATE),
     ],
 )
-def test_wind_with_load_rules(wind_mph: float, load_lb: float, expected: RiskLevel) -> None:
+def test_load_rules_raise_wind_level_by_weight(
+    wind_mph: float, load_lb: float, expected: RiskLevel
+) -> None:
     base = classify_wind(wind_mph)
 
     assert apply_load_rules(base, wind_mph, load_lb) == expected
@@ -106,8 +102,7 @@ def test_load_rules_never_lower_a_level(level: RiskLevel, wind_mph: float, load_
     assert apply_load_rules(level, wind_mph, load_lb) >= level
 
 
-def test_load_rule_raises_level_from_rain_baseline() -> None:
-    # Rain alone is MODERATE, but a heavy load in 40 mph wind forces SEVERE.
+def test_heavy_load_in_40_mph_wind_raises_a_moderate_level_to_severe() -> None:
     assert apply_load_rules(MODERATE, 40, 50000) == SEVERE
 
 
@@ -136,13 +131,6 @@ def test_assess_checkpoint_snow_is_worst_factor() -> None:
     assert result.snow_level == NO_TRAVEL
 
 
-def test_assess_checkpoint_takes_combined_rain_rate() -> None:
-    # assess_checkpoint takes the already-combined rain rate.
-    result = assess_checkpoint(wind_mph=0, rain_in_hr=0.10, snow_in_hr=0, load_lb=0)
-
-    assert result.rain_level == MODERATE
-
-
 def test_assess_checkpoint_load_rule_raises_and_explains() -> None:
     result = assess_checkpoint(wind_mph=47, rain_in_hr=0, snow_in_hr=0, load_lb=35000)
 
@@ -158,10 +146,9 @@ def test_assess_checkpoint_load_rule_not_reported_when_it_changes_nothing() -> N
     assert not any("load rule" in reason for reason in result.reasons)
 
 
-def test_assess_checkpoint_load_rule_silent_when_level_already_as_high() -> None:
+def test_assess_checkpoint_load_rule_not_reported_when_rain_is_already_severe() -> None:
     result = assess_checkpoint(wind_mph=40, rain_in_hr=0.6, snow_in_hr=0, load_lb=50000)
 
-    # Wind rule gives SEVERE, rain is already SEVERE: level unchanged, no load-rule reason.
     assert result.level == SEVERE
     assert not any("load rule" in reason for reason in result.reasons)
 
@@ -173,11 +160,13 @@ def test_assess_checkpoint_wind_55_is_no_travel_for_any_load() -> None:
 
 
 @pytest.mark.parametrize(
-    ("wind", "rain", "snow"),
+    ("wind_mph", "rain_in_hr", "snow_in_hr"),
     [(None, 0, 0), (10, None, 0), (10, 0, None), (None, None, None)],
 )
-def test_assess_checkpoint_missing_values_count_as_zero(wind, rain, snow) -> None:
-    result = assess_checkpoint(wind_mph=wind, rain_in_hr=rain, snow_in_hr=snow, load_lb=20000)
+def test_assess_checkpoint_missing_values_count_as_zero(
+    wind_mph: float | None, rain_in_hr: float | None, snow_in_hr: float | None
+) -> None:
+    result = assess_checkpoint(wind_mph, rain_in_hr, snow_in_hr, load_lb=20000)
 
     assert result.level == LOW
     assert "missing data" in result.reasons

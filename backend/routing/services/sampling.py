@@ -1,6 +1,7 @@
 """Checkpoint sampling along a route, with an ETA at each checkpoint."""
 
 from bisect import bisect_right
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
@@ -33,7 +34,9 @@ def _checkpoint_miles(total_miles: float, interval_miles: float) -> list[float]:
     return miles
 
 
-def _elapsed_interpolator(time_points: list[TimePoint], total_miles: float):
+def _elapsed_interpolator(
+    time_points: list[TimePoint], total_miles: float
+) -> Callable[[float], float]:
     """Return mile -> elapsed seconds, linear between the surrounding time points.
 
     Offsets are rescaled so the last one lands on the polyline length: the routing service
@@ -67,8 +70,7 @@ def build_checkpoints(
 ) -> list[Checkpoint]:
     """Checkpoints every `interval_miles` along `coords`, origin and destination included.
 
-    `time_points` are (offset_miles, elapsed_seconds) pairs from the routing instructions.
-    If they are missing, ETAs are proportional to distance over `total_seconds`.
+    Without `time_points`, ETAs are proportional to distance over `total_seconds`.
     """
     if len(coords) < 2:
         raise ValueError("at least two coordinates are required")

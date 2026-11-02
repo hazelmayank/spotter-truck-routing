@@ -1,21 +1,8 @@
-from math import radians
-
 import pytest
 
-from routing.services.geo import (
-    EARTH_RADIUS_MILES,
-    cumulative_distances,
-    haversine_miles,
-    interpolate_point,
-)
+from routing.services.geo import cumulative_distances, haversine_miles, interpolate_point
 
-MILES_PER_DEGREE = EARTH_RADIUS_MILES * radians(1)  # one degree on a great circle
-
-
-def equator_line(miles: float, points: int = 5) -> list[tuple[float, float]]:
-    """Straight line along the equator, `points` evenly spaced vertices, `miles` long."""
-    degrees = miles / MILES_PER_DEGREE
-    return [(0.0, degrees * i / (points - 1)) for i in range(points)]
+from .lines import MILES_PER_DEGREE, equator_line
 
 
 def test_haversine_one_degree_of_equator() -> None:

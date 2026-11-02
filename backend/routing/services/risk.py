@@ -1,7 +1,8 @@
 """Checkpoint weather risk: per-factor classification plus load-based escalation."""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import IntEnum
+from typing import NamedTuple
 
 
 class RiskLevel(IntEnum):
@@ -25,13 +26,20 @@ WIND_MPH_BOUNDS: tuple[Bound, ...] = ((25, False), (35, False), (45, False), (55
 RAIN_IN_HR_BOUNDS: tuple[Bound, ...] = ((0.10, False), (0.25, False), (0.50, False), (1.00, True))
 SNOW_IN_HR_BOUNDS: tuple[Bound, ...] = ((0.5, False), (1.0, False), (2.0, False), (3.0, True))
 
-# Load rules raise (never lower) the level. Wind in [min, max) with load above the limit.
 WIND_NO_TRAVEL_MPH = 55
-HEAVY_LOAD_NO_TRAVEL = (45, 55, 30_000, RiskLevel.NO_TRAVEL)  # (wind_min, wind_max, load_gt, level)
-HEAVY_LOAD_SEVERE = (35, 45, 40_000, RiskLevel.SEVERE)
-LOAD_RULES = (HEAVY_LOAD_NO_TRAVEL, HEAVY_LOAD_SEVERE)
 
-MISSING_DATA_REASON = "missing data"
+
+class LoadRule(NamedTuple):
+    wind_min_mph: float
+    wind_max_mph: float
+    load_over_lb: float
+    level: RiskLevel
+
+
+LOAD_RULES = (
+    LoadRule(wind_min_mph=45, wind_max_mph=55, load_over_lb=30_000, level=RiskLevel.NO_TRAVEL),
+    LoadRule(wind_min_mph=35, wind_max_mph=45, load_over_lb=40_000, level=RiskLevel.SEVERE),
+)
 
 
 @dataclass(frozen=True)
@@ -40,11 +48,12 @@ class CheckpointRisk:
     wind_level: RiskLevel
     rain_level: RiskLevel
     snow_level: RiskLevel
-    reasons: list[str] = field(default_factory=list)
+    reasons: list[str]
 
 
 def _classify(value: float, bounds: tuple[Bound, ...]) -> RiskLevel:
-    # Four bounds cover LOW..SEVERE; zip stops there and anything beyond is NO_TRAVEL.
+    # There are four bounds for five levels: zip stops after SEVERE, and anything past
+    # the last bound is NO_TRAVEL.
     for level, (bound, inclusive) in zip(RiskLevel, bounds, strict=False):
         if value < bound or (inclusive and value == bound):
             return level
@@ -67,9 +76,9 @@ def apply_load_rules(level: RiskLevel, wind_mph: float, load_lb: float) -> RiskL
     """Return `level` raised by any matching load rule; a rule never lowers it."""
     if wind_mph >= WIND_NO_TRAVEL_MPH:
         return RiskLevel.NO_TRAVEL
-    for wind_min, wind_max, load_gt, rule_level in LOAD_RULES:
-        if wind_min <= wind_mph < wind_max and load_lb > load_gt:
-            level = max(level, rule_level)
+    for rule in LOAD_RULES:
+        if rule.wind_min_mph <= wind_mph < rule.wind_max_mph and load_lb > rule.load_over_lb:
+            level = max(level, rule.level)
     return level
 
 
@@ -82,7 +91,7 @@ def assess_checkpoint(
     """Combine wind, rain and snow, then apply load rules. Missing values count as 0."""
     reasons: list[str] = []
     if None in (wind_mph, rain_in_hr, snow_in_hr):
-        reasons.append(MISSING_DATA_REASON)
+        reasons.append("missing data")
     wind = wind_mph or 0.0
     rain = rain_in_hr or 0.0
     snow = snow_in_hr or 0.0
