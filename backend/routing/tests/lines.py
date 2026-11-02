@@ -1,8 +1,4 @@
-from math import radians
-
-from routing.services.geo import EARTH_RADIUS_MILES, Point
-
-MILES_PER_DEGREE = EARTH_RADIUS_MILES * radians(1)
+from routing.services.geo import MILES_PER_DEGREE, Point
 
 
 def equator_line(miles: float, points: int = 21) -> list[Point]:

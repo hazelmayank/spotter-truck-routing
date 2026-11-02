@@ -11,6 +11,18 @@ One line per non-obvious decision.
 - When time points are missing, ETAs fall back to distance-proportional time over a caller-supplied total duration (the same as a two-point `(0, 0)`, `(total, duration)` list); with neither, it is an error rather than a guess.
 - Departure must be timezone-aware and is normalised to UTC so every ETA is UTC.
 
+## TomTom and route alternatives
+
+- All TomTom calls go through `TomTomClient.get_json`; services take an optional client so tests pass a fake and never touch the network.
+- Network errors are re-raised without the original message because it contains the request URL, and with it the API key.
+- Extra routes use a via point as a regular waypoint in the request path, because TomTom returns alternatives only for routes without waypoints.
+- The via point is the midpoint of the fastest route moved sideways by 15% of the straight-line origin-destination distance, perpendicular to that straight line, using a flat local approximation (about 0.3% error at 100 mi, which does not matter for picking a detour).
+- A via route is dropped when its travel time is more than 1.4 times the fastest route's, or when over 90% of its points (sampled every mile) lie within 0.5 mi of an existing route (sampled every 0.25 mi).
+- If a via point cannot be routed, that side is skipped; the first request failing is never swallowed.
+- The response polyline is simplified (Douglas-Peucker, 0.0005 deg); `RouteOption.coords` keeps the full line for checkpoint sampling and ETAs.
+- Geocoding and suggestions are limited to the US and Canada, and a suggestion request with a blank query returns nothing without calling the API.
+- The test fixtures follow TomTom's documented calculateRoute response shape but were generated, not recorded from the live API; `try_route` is the check against the real one.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).

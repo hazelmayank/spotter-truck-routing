@@ -1,0 +1,377 @@
+{
+ "formatVersion": "0.0.12",
+ "routes": [
+  {
+   "summary": {
+    "lengthInMeters": 1167623,
+    "travelTimeInSeconds": 42910,
+    "trafficDelayInSeconds": 1716,
+    "trafficLengthInMeters": 0,
+    "departureTime": "2026-11-03T02:00:00-06:00",
+    "arrivalTime": "2026-11-03T14:00:00-07:00",
+    "noTrafficTravelTimeInSeconds": 41194,
+    "historicTrafficTravelTimeInSeconds": 42052,
+    "liveTrafficIncidentsTravelTimeInSeconds": 42910
+   },
+   "legs": [
+    {
+     "summary": {
+      "lengthInMeters": 1167623,
+      "travelTimeInSeconds": 42910,
+      "trafficDelayInSeconds": 1716,
+      "trafficLengthInMeters": 0,
+      "departureTime": "2026-11-03T02:00:00-06:00",
+      "arrivalTime": "2026-11-03T14:00:00-07:00",
+      "noTrafficTravelTimeInSeconds": 41194,
+      "historicTrafficTravelTimeInSeconds": 42052,
+      "liveTrafficIncidentsTravelTimeInSeconds": 42910
+     },
+     "points": [
+      {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      {
+       "latitude": 32.91882,
+       "longitude": -97.00905
+      },
+      {
+       "latitude": 33.06095,
+       "longitude": -97.2211
+      },
+      {
+       "latitude": 33.20307,
+       "longitude": -97.43315
+      },
+      {
+       "latitude": 33.3452,
+       "longitude": -97.6452
+      },
+      {
+       "latitude": 33.48732,
+       "longitude": -97.85725
+      },
+      {
+       "latitude": 33.62945,
+       "longitude": -98.0693
+      },
+      {
+       "latitude": 33.77157,
+       "longitude": -98.28135
+      },
+      {
+       "latitude": 33.9137,
+       "longitude": -98.4934
+      },
+      {
+       "latitude": 33.99547,
+       "longitude": -98.70202
+      },
+      {
+       "latitude": 34.07724,
+       "longitude": -98.91064
+      },
+      {
+       "latitude": 34.15901,
+       "longitude": -99.11926
+      },
+      {
+       "latitude": 34.24077,
+       "longitude": -99.32787
+      },
+      {
+       "latitude": 34.32254,
+       "longitude": -99.53649
+      },
+      {
+       "latitude": 34.40431,
+       "longitude": -99.74511
+      },
+      {
+       "latitude": 34.48608,
+       "longitude": -99.95373
+      },
+      {
+       "latitude": 34.56785,
+       "longitude": -100.16235
+      },
+      {
+       "latitude": 34.64962,
+       "longitude": -100.37097
+      },
+      {
+       "latitude": 34.73139,
+       "longitude": -100.57959
+      },
+      {
+       "latitude": 34.81316,
+       "longitude": -100.78821
+      },
+      {
+       "latitude": 34.89493,
+       "longitude": -100.99683
+      },
+      {
+       "latitude": 34.97669,
+       "longitude": -101.20544
+      },
+      {
+       "latitude": 35.05846,
+       "longitude": -101.41406
+      },
+      {
+       "latitude": 35.14023,
+       "longitude": -101.62268
+      },
+      {
+       "latitude": 35.222,
+       "longitude": -101.8313
+      },
+      {
+       "latitude": 35.43135,
+       "longitude": -102.00177
+      },
+      {
+       "latitude": 35.6407,
+       "longitude": -102.17225
+      },
+      {
+       "latitude": 35.85005,
+       "longitude": -102.34273
+      },
+      {
+       "latitude": 36.0594,
+       "longitude": -102.5132
+      },
+      {
+       "latitude": 36.15314,
+       "longitude": -102.72719
+      },
+      {
+       "latitude": 36.24689,
+       "longitude": -102.94118
+      },
+      {
+       "latitude": 36.34063,
+       "longitude": -103.15517
+      },
+      {
+       "latitude": 36.43438,
+       "longitude": -103.36916
+      },
+      {
+       "latitude": 36.52812,
+       "longitude": -103.58314
+      },
+      {
+       "latitude": 36.62187,
+       "longitude": -103.79713
+      },
+      {
+       "latitude": 36.71561,
+       "longitude": -104.01112
+      },
+      {
+       "latitude": 36.80936,
+       "longitude": -104.22511
+      },
+      {
+       "latitude": 36.9031,
+       "longitude": -104.4391
+      },
+      {
+       "latitude": 37.12832,
+       "longitude": -104.46743
+      },
+      {
+       "latitude": 37.35353,
+       "longitude": -104.49577
+      },
+      {
+       "latitude": 37.57875,
+       "longitude": -104.5241
+      },
+      {
+       "latitude": 37.80397,
+       "longitude": -104.55243
+      },
+      {
+       "latitude": 38.02918,
+       "longitude": -104.58077
+      },
+      {
+       "latitude": 38.2544,
+       "longitude": -104.6091
+      },
+      {
+       "latitude": 38.46651,
+       "longitude": -104.66356
+      },
+      {
+       "latitude": 38.67863,
+       "longitude": -104.71801
+      },
+      {
+       "latitude": 38.89074,
+       "longitude": -104.77247
+      },
+      {
+       "latitude": 39.10286,
+       "longitude": -104.82693
+      },
+      {
+       "latitude": 39.31497,
+       "longitude": -104.88139
+      },
+      {
+       "latitude": 39.52709,
+       "longitude": -104.93584
+      },
+      {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      }
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "startPointIndex": 0,
+     "endPointIndex": 50,
+     "sectionType": "TRAVEL_MODE",
+     "travelMode": "truck"
+    }
+   ],
+   "guidance": {
+    "instructions": [
+     {
+      "routeOffsetInMeters": 0,
+      "travelTimeInSeconds": 0,
+      "point": {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      "pointIndex": 0,
+      "instructionType": "LOCATION_DEPARTURE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "DEPART",
+      "message": "Follow US-287 toward Dallas"
+     },
+     {
+      "routeOffsetInMeters": 202027,
+      "travelTimeInSeconds": 9620,
+      "point": {
+       "latitude": 33.9137,
+       "longitude": -98.4934
+      },
+      "pointIndex": 8,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Wichita Falls"
+     },
+     {
+      "routeOffsetInMeters": 540513,
+      "travelTimeInSeconds": 21133,
+      "point": {
+       "latitude": 35.222,
+       "longitude": -101.8313
+      },
+      "pointIndex": 24,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Amarillo"
+     },
+     {
+      "routeOffsetInMeters": 652172,
+      "travelTimeInSeconds": 25121,
+      "point": {
+       "latitude": 36.0594,
+       "longitude": -102.5132
+      },
+      "pointIndex": 28,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Dalhart"
+     },
+     {
+      "routeOffsetInMeters": 848260,
+      "travelTimeInSeconds": 31791,
+      "point": {
+       "latitude": 36.9031,
+       "longitude": -104.4391
+      },
+      "pointIndex": 37,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Raton"
+     },
+     {
+      "routeOffsetInMeters": 999264,
+      "travelTimeInSeconds": 37184,
+      "point": {
+       "latitude": 38.2544,
+       "longitude": -104.6091
+      },
+      "pointIndex": 43,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Pueblo"
+     },
+     {
+      "routeOffsetInMeters": 1167623,
+      "travelTimeInSeconds": 42910,
+      "point": {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      },
+      "pointIndex": 50,
+      "instructionType": "LOCATION_ARRIVAL",
+      "street": "",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "ARRIVE",
+      "message": "Arrive at Denver"
+     }
+    ]
+   }
+  }
+ ]
+}

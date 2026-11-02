@@ -1,0 +1,1217 @@
+{
+ "formatVersion": "0.0.12",
+ "routes": [
+  {
+   "summary": {
+    "lengthInMeters": 1167623,
+    "travelTimeInSeconds": 42910,
+    "trafficDelayInSeconds": 1716,
+    "trafficLengthInMeters": 0,
+    "departureTime": "2026-11-03T02:00:00-06:00",
+    "arrivalTime": "2026-11-03T14:00:00-07:00",
+    "noTrafficTravelTimeInSeconds": 41194,
+    "historicTrafficTravelTimeInSeconds": 42052,
+    "liveTrafficIncidentsTravelTimeInSeconds": 42910
+   },
+   "legs": [
+    {
+     "summary": {
+      "lengthInMeters": 1167623,
+      "travelTimeInSeconds": 42910,
+      "trafficDelayInSeconds": 1716,
+      "trafficLengthInMeters": 0,
+      "departureTime": "2026-11-03T02:00:00-06:00",
+      "arrivalTime": "2026-11-03T14:00:00-07:00",
+      "noTrafficTravelTimeInSeconds": 41194,
+      "historicTrafficTravelTimeInSeconds": 42052,
+      "liveTrafficIncidentsTravelTimeInSeconds": 42910
+     },
+     "points": [
+      {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      {
+       "latitude": 32.91882,
+       "longitude": -97.00905
+      },
+      {
+       "latitude": 33.06095,
+       "longitude": -97.2211
+      },
+      {
+       "latitude": 33.20307,
+       "longitude": -97.43315
+      },
+      {
+       "latitude": 33.3452,
+       "longitude": -97.6452
+      },
+      {
+       "latitude": 33.48732,
+       "longitude": -97.85725
+      },
+      {
+       "latitude": 33.62945,
+       "longitude": -98.0693
+      },
+      {
+       "latitude": 33.77157,
+       "longitude": -98.28135
+      },
+      {
+       "latitude": 33.9137,
+       "longitude": -98.4934
+      },
+      {
+       "latitude": 33.99547,
+       "longitude": -98.70202
+      },
+      {
+       "latitude": 34.07724,
+       "longitude": -98.91064
+      },
+      {
+       "latitude": 34.15901,
+       "longitude": -99.11926
+      },
+      {
+       "latitude": 34.24077,
+       "longitude": -99.32787
+      },
+      {
+       "latitude": 34.32254,
+       "longitude": -99.53649
+      },
+      {
+       "latitude": 34.40431,
+       "longitude": -99.74511
+      },
+      {
+       "latitude": 34.48608,
+       "longitude": -99.95373
+      },
+      {
+       "latitude": 34.56785,
+       "longitude": -100.16235
+      },
+      {
+       "latitude": 34.64962,
+       "longitude": -100.37097
+      },
+      {
+       "latitude": 34.73139,
+       "longitude": -100.57959
+      },
+      {
+       "latitude": 34.81316,
+       "longitude": -100.78821
+      },
+      {
+       "latitude": 34.89493,
+       "longitude": -100.99683
+      },
+      {
+       "latitude": 34.97669,
+       "longitude": -101.20544
+      },
+      {
+       "latitude": 35.05846,
+       "longitude": -101.41406
+      },
+      {
+       "latitude": 35.14023,
+       "longitude": -101.62268
+      },
+      {
+       "latitude": 35.222,
+       "longitude": -101.8313
+      },
+      {
+       "latitude": 35.43135,
+       "longitude": -102.00177
+      },
+      {
+       "latitude": 35.6407,
+       "longitude": -102.17225
+      },
+      {
+       "latitude": 35.85005,
+       "longitude": -102.34273
+      },
+      {
+       "latitude": 36.0594,
+       "longitude": -102.5132
+      },
+      {
+       "latitude": 36.15314,
+       "longitude": -102.72719
+      },
+      {
+       "latitude": 36.24689,
+       "longitude": -102.94118
+      },
+      {
+       "latitude": 36.34063,
+       "longitude": -103.15517
+      },
+      {
+       "latitude": 36.43438,
+       "longitude": -103.36916
+      },
+      {
+       "latitude": 36.52812,
+       "longitude": -103.58314
+      },
+      {
+       "latitude": 36.62187,
+       "longitude": -103.79713
+      },
+      {
+       "latitude": 36.71561,
+       "longitude": -104.01112
+      },
+      {
+       "latitude": 36.80936,
+       "longitude": -104.22511
+      },
+      {
+       "latitude": 36.9031,
+       "longitude": -104.4391
+      },
+      {
+       "latitude": 37.12832,
+       "longitude": -104.46743
+      },
+      {
+       "latitude": 37.35353,
+       "longitude": -104.49577
+      },
+      {
+       "latitude": 37.57875,
+       "longitude": -104.5241
+      },
+      {
+       "latitude": 37.80397,
+       "longitude": -104.55243
+      },
+      {
+       "latitude": 38.02918,
+       "longitude": -104.58077
+      },
+      {
+       "latitude": 38.2544,
+       "longitude": -104.6091
+      },
+      {
+       "latitude": 38.46651,
+       "longitude": -104.66356
+      },
+      {
+       "latitude": 38.67863,
+       "longitude": -104.71801
+      },
+      {
+       "latitude": 38.89074,
+       "longitude": -104.77247
+      },
+      {
+       "latitude": 39.10286,
+       "longitude": -104.82693
+      },
+      {
+       "latitude": 39.31497,
+       "longitude": -104.88139
+      },
+      {
+       "latitude": 39.52709,
+       "longitude": -104.93584
+      },
+      {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      }
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "startPointIndex": 0,
+     "endPointIndex": 50,
+     "sectionType": "TRAVEL_MODE",
+     "travelMode": "truck"
+    }
+   ],
+   "guidance": {
+    "instructions": [
+     {
+      "routeOffsetInMeters": 0,
+      "travelTimeInSeconds": 0,
+      "point": {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      "pointIndex": 0,
+      "instructionType": "LOCATION_DEPARTURE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "DEPART",
+      "message": "Follow US-287 toward Dallas"
+     },
+     {
+      "routeOffsetInMeters": 202027,
+      "travelTimeInSeconds": 9620,
+      "point": {
+       "latitude": 33.9137,
+       "longitude": -98.4934
+      },
+      "pointIndex": 8,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Wichita Falls"
+     },
+     {
+      "routeOffsetInMeters": 540513,
+      "travelTimeInSeconds": 21133,
+      "point": {
+       "latitude": 35.222,
+       "longitude": -101.8313
+      },
+      "pointIndex": 24,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Amarillo"
+     },
+     {
+      "routeOffsetInMeters": 652172,
+      "travelTimeInSeconds": 25121,
+      "point": {
+       "latitude": 36.0594,
+       "longitude": -102.5132
+      },
+      "pointIndex": 28,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Dalhart"
+     },
+     {
+      "routeOffsetInMeters": 848260,
+      "travelTimeInSeconds": 31791,
+      "point": {
+       "latitude": 36.9031,
+       "longitude": -104.4391
+      },
+      "pointIndex": 37,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Raton"
+     },
+     {
+      "routeOffsetInMeters": 999264,
+      "travelTimeInSeconds": 37184,
+      "point": {
+       "latitude": 38.2544,
+       "longitude": -104.6091
+      },
+      "pointIndex": 43,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-287",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-287 toward Pueblo"
+     },
+     {
+      "routeOffsetInMeters": 1167623,
+      "travelTimeInSeconds": 42910,
+      "point": {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      },
+      "pointIndex": 50,
+      "instructionType": "LOCATION_ARRIVAL",
+      "street": "",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "ARRIVE",
+      "message": "Arrive at Denver"
+     }
+    ]
+   }
+  },
+  {
+   "summary": {
+    "lengthInMeters": 1335533,
+    "travelTimeInSeconds": 52332,
+    "trafficDelayInSeconds": 2093,
+    "trafficLengthInMeters": 0,
+    "departureTime": "2026-11-03T02:00:00-06:00",
+    "arrivalTime": "2026-11-03T14:00:00-07:00",
+    "noTrafficTravelTimeInSeconds": 50239,
+    "historicTrafficTravelTimeInSeconds": 51285,
+    "liveTrafficIncidentsTravelTimeInSeconds": 52332
+   },
+   "legs": [
+    {
+     "summary": {
+      "lengthInMeters": 1335533,
+      "travelTimeInSeconds": 52332,
+      "trafficDelayInSeconds": 2093,
+      "trafficLengthInMeters": 0,
+      "departureTime": "2026-11-03T02:00:00-06:00",
+      "arrivalTime": "2026-11-03T14:00:00-07:00",
+      "noTrafficTravelTimeInSeconds": 50239,
+      "historicTrafficTravelTimeInSeconds": 51285,
+      "liveTrafficIncidentsTravelTimeInSeconds": 52332
+     },
+     "points": [
+      {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      {
+       "latitude": 32.98369,
+       "longitude": -96.85234
+      },
+      {
+       "latitude": 33.19068,
+       "longitude": -96.90768
+      },
+      {
+       "latitude": 33.39768,
+       "longitude": -96.96302
+      },
+      {
+       "latitude": 33.60467,
+       "longitude": -97.01835
+      },
+      {
+       "latitude": 33.81166,
+       "longitude": -97.07369
+      },
+      {
+       "latitude": 34.01865,
+       "longitude": -97.12903
+      },
+      {
+       "latitude": 34.22565,
+       "longitude": -97.18437
+      },
+      {
+       "latitude": 34.43264,
+       "longitude": -97.23971
+      },
+      {
+       "latitude": 34.63963,
+       "longitude": -97.29505
+      },
+      {
+       "latitude": 34.84662,
+       "longitude": -97.35038
+      },
+      {
+       "latitude": 35.05362,
+       "longitude": -97.40572
+      },
+      {
+       "latitude": 35.26061,
+       "longitude": -97.46106
+      },
+      {
+       "latitude": 35.4676,
+       "longitude": -97.5164
+      },
+      {
+       "latitude": 35.66938,
+       "longitude": -97.49946
+      },
+      {
+       "latitude": 35.87116,
+       "longitude": -97.48253
+      },
+      {
+       "latitude": 36.07295,
+       "longitude": -97.46559
+      },
+      {
+       "latitude": 36.27473,
+       "longitude": -97.44865
+      },
+      {
+       "latitude": 36.47651,
+       "longitude": -97.43172
+      },
+      {
+       "latitude": 36.67829,
+       "longitude": -97.41478
+      },
+      {
+       "latitude": 36.88007,
+       "longitude": -97.39785
+      },
+      {
+       "latitude": 37.08185,
+       "longitude": -97.38091
+      },
+      {
+       "latitude": 37.28364,
+       "longitude": -97.36397
+      },
+      {
+       "latitude": 37.48542,
+       "longitude": -97.34704
+      },
+      {
+       "latitude": 37.6872,
+       "longitude": -97.3301
+      },
+      {
+       "latitude": 37.91782,
+       "longitude": -97.38636
+      },
+      {
+       "latitude": 38.14844,
+       "longitude": -97.44262
+      },
+      {
+       "latitude": 38.37906,
+       "longitude": -97.49888
+      },
+      {
+       "latitude": 38.60968,
+       "longitude": -97.55514
+      },
+      {
+       "latitude": 38.8403,
+       "longitude": -97.6114
+      },
+      {
+       "latitude": 38.84516,
+       "longitude": -97.82583
+      },
+      {
+       "latitude": 38.85003,
+       "longitude": -98.04025
+      },
+      {
+       "latitude": 38.85489,
+       "longitude": -98.25468
+      },
+      {
+       "latitude": 38.85975,
+       "longitude": -98.4691
+      },
+      {
+       "latitude": 38.86461,
+       "longitude": -98.68353
+      },
+      {
+       "latitude": 38.86947,
+       "longitude": -98.89795
+      },
+      {
+       "latitude": 38.87434,
+       "longitude": -99.11238
+      },
+      {
+       "latitude": 38.8792,
+       "longitude": -99.3268
+      },
+      {
+       "latitude": 38.89752,
+       "longitude": -99.53469
+      },
+      {
+       "latitude": 38.91584,
+       "longitude": -99.74258
+      },
+      {
+       "latitude": 38.93416,
+       "longitude": -99.95047
+      },
+      {
+       "latitude": 38.95248,
+       "longitude": -100.15836
+      },
+      {
+       "latitude": 38.9708,
+       "longitude": -100.36625
+      },
+      {
+       "latitude": 38.98911,
+       "longitude": -100.57414
+      },
+      {
+       "latitude": 39.00743,
+       "longitude": -100.78203
+      },
+      {
+       "latitude": 39.02575,
+       "longitude": -100.98992
+      },
+      {
+       "latitude": 39.04407,
+       "longitude": -101.19781
+      },
+      {
+       "latitude": 39.06239,
+       "longitude": -101.4057
+      },
+      {
+       "latitude": 39.08071,
+       "longitude": -101.6136
+      },
+      {
+       "latitude": 39.09903,
+       "longitude": -101.82149
+      },
+      {
+       "latitude": 39.11735,
+       "longitude": -102.02938
+      },
+      {
+       "latitude": 39.13567,
+       "longitude": -102.23727
+      },
+      {
+       "latitude": 39.15399,
+       "longitude": -102.44516
+      },
+      {
+       "latitude": 39.1723,
+       "longitude": -102.65305
+      },
+      {
+       "latitude": 39.19062,
+       "longitude": -102.86094
+      },
+      {
+       "latitude": 39.20894,
+       "longitude": -103.06883
+      },
+      {
+       "latitude": 39.22726,
+       "longitude": -103.27672
+      },
+      {
+       "latitude": 39.24558,
+       "longitude": -103.48461
+      },
+      {
+       "latitude": 39.2639,
+       "longitude": -103.6925
+      },
+      {
+       "latitude": 39.34312,
+       "longitude": -103.9088
+      },
+      {
+       "latitude": 39.42233,
+       "longitude": -104.1251
+      },
+      {
+       "latitude": 39.50155,
+       "longitude": -104.3414
+      },
+      {
+       "latitude": 39.58077,
+       "longitude": -104.5577
+      },
+      {
+       "latitude": 39.65998,
+       "longitude": -104.774
+      },
+      {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      }
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "startPointIndex": 0,
+     "endPointIndex": 64,
+     "sectionType": "TRAVEL_MODE",
+     "travelMode": "truck"
+    }
+   ],
+   "guidance": {
+    "instructions": [
+     {
+      "routeOffsetInMeters": 0,
+      "travelTimeInSeconds": 0,
+      "point": {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      "pointIndex": 0,
+      "instructionType": "LOCATION_DEPARTURE",
+      "street": "I-35",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "DEPART",
+      "message": "Follow I-35 toward Dallas"
+     },
+     {
+      "routeOffsetInMeters": 306458,
+      "travelTimeInSeconds": 15134,
+      "point": {
+       "latitude": 35.4676,
+       "longitude": -97.5164
+      },
+      "pointIndex": 13,
+      "instructionType": "ROAD_CHANGE",
+      "street": "I-35",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow I-35 toward Oklahoma City"
+     },
+     {
+      "routeOffsetInMeters": 553829,
+      "travelTimeInSeconds": 23859,
+      "point": {
+       "latitude": 37.6872,
+       "longitude": -97.3301
+      },
+      "pointIndex": 24,
+      "instructionType": "ROAD_CHANGE",
+      "street": "I-35",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow I-35 toward Wichita"
+     },
+     {
+      "routeOffsetInMeters": 684380,
+      "travelTimeInSeconds": 28695,
+      "point": {
+       "latitude": 38.8403,
+       "longitude": -97.6114
+      },
+      "pointIndex": 29,
+      "instructionType": "ROAD_CHANGE",
+      "street": "I-35",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow I-35 toward Salina"
+     },
+     {
+      "routeOffsetInMeters": 832974,
+      "travelTimeInSeconds": 33936,
+      "point": {
+       "latitude": 38.8792,
+       "longitude": -99.3268
+      },
+      "pointIndex": 37,
+      "instructionType": "ROAD_CHANGE",
+      "street": "I-35",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow I-35 toward Hays"
+     },
+     {
+      "routeOffsetInMeters": 1212276,
+      "travelTimeInSeconds": 47984,
+      "point": {
+       "latitude": 39.2639,
+       "longitude": -103.6925
+      },
+      "pointIndex": 58,
+      "instructionType": "ROAD_CHANGE",
+      "street": "I-35",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow I-35 toward Limon"
+     },
+     {
+      "routeOffsetInMeters": 1335533,
+      "travelTimeInSeconds": 52332,
+      "point": {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      },
+      "pointIndex": 64,
+      "instructionType": "LOCATION_ARRIVAL",
+      "street": "",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "ARRIVE",
+      "message": "Arrive at Denver"
+     }
+    ]
+   }
+  },
+  {
+   "summary": {
+    "lengthInMeters": 1341396,
+    "travelTimeInSeconds": 57961,
+    "trafficDelayInSeconds": 2318,
+    "trafficLengthInMeters": 0,
+    "departureTime": "2026-11-03T02:00:00-06:00",
+    "arrivalTime": "2026-11-03T14:00:00-07:00",
+    "noTrafficTravelTimeInSeconds": 55643,
+    "historicTrafficTravelTimeInSeconds": 56802,
+    "liveTrafficIncidentsTravelTimeInSeconds": 57961
+   },
+   "legs": [
+    {
+     "summary": {
+      "lengthInMeters": 1341396,
+      "travelTimeInSeconds": 57961,
+      "trafficDelayInSeconds": 2318,
+      "trafficLengthInMeters": 0,
+      "departureTime": "2026-11-03T02:00:00-06:00",
+      "arrivalTime": "2026-11-03T14:00:00-07:00",
+      "noTrafficTravelTimeInSeconds": 55643,
+      "historicTrafficTravelTimeInSeconds": 56802,
+      "liveTrafficIncidentsTravelTimeInSeconds": 57961
+     },
+     "points": [
+      {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      {
+       "latitude": 32.80875,
+       "longitude": -96.99933
+      },
+      {
+       "latitude": 32.8408,
+       "longitude": -97.20166
+      },
+      {
+       "latitude": 32.87284,
+       "longitude": -97.40398
+      },
+      {
+       "latitude": 32.90489,
+       "longitude": -97.60631
+      },
+      {
+       "latitude": 32.93694,
+       "longitude": -97.80864
+      },
+      {
+       "latitude": 32.96899,
+       "longitude": -98.01097
+      },
+      {
+       "latitude": 33.00104,
+       "longitude": -98.2133
+      },
+      {
+       "latitude": 33.03308,
+       "longitude": -98.41562
+      },
+      {
+       "latitude": 33.06513,
+       "longitude": -98.61795
+      },
+      {
+       "latitude": 33.09718,
+       "longitude": -98.82028
+      },
+      {
+       "latitude": 33.12923,
+       "longitude": -99.02261
+      },
+      {
+       "latitude": 33.16128,
+       "longitude": -99.22494
+      },
+      {
+       "latitude": 33.19332,
+       "longitude": -99.42726
+      },
+      {
+       "latitude": 33.22537,
+       "longitude": -99.62959
+      },
+      {
+       "latitude": 33.25742,
+       "longitude": -99.83192
+      },
+      {
+       "latitude": 33.28947,
+       "longitude": -100.03425
+      },
+      {
+       "latitude": 33.32152,
+       "longitude": -100.23658
+      },
+      {
+       "latitude": 33.35356,
+       "longitude": -100.4389
+      },
+      {
+       "latitude": 33.38561,
+       "longitude": -100.64123
+      },
+      {
+       "latitude": 33.41766,
+       "longitude": -100.84356
+      },
+      {
+       "latitude": 33.44971,
+       "longitude": -101.04589
+      },
+      {
+       "latitude": 33.48176,
+       "longitude": -101.24822
+      },
+      {
+       "latitude": 33.5138,
+       "longitude": -101.45054
+      },
+      {
+       "latitude": 33.54585,
+       "longitude": -101.65287
+      },
+      {
+       "latitude": 33.5779,
+       "longitude": -101.8552
+      },
+      {
+       "latitude": 33.71572,
+       "longitude": -102.0802
+      },
+      {
+       "latitude": 33.85353,
+       "longitude": -102.3052
+      },
+      {
+       "latitude": 33.99135,
+       "longitude": -102.5302
+      },
+      {
+       "latitude": 34.12917,
+       "longitude": -102.7552
+      },
+      {
+       "latitude": 34.26698,
+       "longitude": -102.9802
+      },
+      {
+       "latitude": 34.4048,
+       "longitude": -103.2052
+      },
+      {
+       "latitude": 34.52371,
+       "longitude": -103.40707
+      },
+      {
+       "latitude": 34.64262,
+       "longitude": -103.60894
+      },
+      {
+       "latitude": 34.76153,
+       "longitude": -103.81081
+      },
+      {
+       "latitude": 34.88044,
+       "longitude": -104.01268
+      },
+      {
+       "latitude": 34.99935,
+       "longitude": -104.21455
+      },
+      {
+       "latitude": 35.11826,
+       "longitude": -104.41642
+      },
+      {
+       "latitude": 35.23717,
+       "longitude": -104.61829
+      },
+      {
+       "latitude": 35.35608,
+       "longitude": -104.82016
+      },
+      {
+       "latitude": 35.47499,
+       "longitude": -105.02203
+      },
+      {
+       "latitude": 35.5939,
+       "longitude": -105.2239
+      },
+      {
+       "latitude": 35.8121,
+       "longitude": -105.0931
+      },
+      {
+       "latitude": 36.0303,
+       "longitude": -104.9623
+      },
+      {
+       "latitude": 36.2485,
+       "longitude": -104.8315
+      },
+      {
+       "latitude": 36.4667,
+       "longitude": -104.7007
+      },
+      {
+       "latitude": 36.6849,
+       "longitude": -104.5699
+      },
+      {
+       "latitude": 36.9031,
+       "longitude": -104.4391
+      },
+      {
+       "latitude": 37.12832,
+       "longitude": -104.46743
+      },
+      {
+       "latitude": 37.35353,
+       "longitude": -104.49577
+      },
+      {
+       "latitude": 37.57875,
+       "longitude": -104.5241
+      },
+      {
+       "latitude": 37.80397,
+       "longitude": -104.55243
+      },
+      {
+       "latitude": 38.02918,
+       "longitude": -104.58077
+      },
+      {
+       "latitude": 38.2544,
+       "longitude": -104.6091
+      },
+      {
+       "latitude": 38.46651,
+       "longitude": -104.66356
+      },
+      {
+       "latitude": 38.67863,
+       "longitude": -104.71801
+      },
+      {
+       "latitude": 38.89074,
+       "longitude": -104.77247
+      },
+      {
+       "latitude": 39.10286,
+       "longitude": -104.82693
+      },
+      {
+       "latitude": 39.31497,
+       "longitude": -104.88139
+      },
+      {
+       "latitude": 39.52709,
+       "longitude": -104.93584
+      },
+      {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      }
+     ]
+    }
+   ],
+   "sections": [
+    {
+     "startPointIndex": 0,
+     "endPointIndex": 60,
+     "sectionType": "TRAVEL_MODE",
+     "travelMode": "truck"
+    }
+   ],
+   "guidance": {
+    "instructions": [
+     {
+      "routeOffsetInMeters": 0,
+      "travelTimeInSeconds": 0,
+      "point": {
+       "latitude": 32.7767,
+       "longitude": -96.797
+      },
+      "pointIndex": 0,
+      "instructionType": "LOCATION_DEPARTURE",
+      "street": "US-84",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "DEPART",
+      "message": "Follow US-84 toward Dallas"
+     },
+     {
+      "routeOffsetInMeters": 479114,
+      "travelTimeInSeconds": 25052,
+      "point": {
+       "latitude": 33.5779,
+       "longitude": -101.8552
+      },
+      "pointIndex": 25,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-84",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-84 toward Lubbock"
+     },
+     {
+      "routeOffsetInMeters": 633857,
+      "travelTimeInSeconds": 30831,
+      "point": {
+       "latitude": 34.4048,
+       "longitude": -103.2052
+      },
+      "pointIndex": 31,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-84",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-84 toward Clovis"
+     },
+     {
+      "routeOffsetInMeters": 860337,
+      "travelTimeInSeconds": 39713,
+      "point": {
+       "latitude": 35.5939,
+       "longitude": -105.2239
+      },
+      "pointIndex": 41,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-84",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-84 toward Las Vegas NM"
+     },
+     {
+      "routeOffsetInMeters": 1022033,
+      "travelTimeInSeconds": 45752,
+      "point": {
+       "latitude": 36.9031,
+       "longitude": -104.4391
+      },
+      "pointIndex": 47,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-84",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-84 toward Raton"
+     },
+     {
+      "routeOffsetInMeters": 1173038,
+      "travelTimeInSeconds": 51673,
+      "point": {
+       "latitude": 38.2544,
+       "longitude": -104.6091
+      },
+      "pointIndex": 53,
+      "instructionType": "ROAD_CHANGE",
+      "street": "US-84",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "KEEP_RIGHT",
+      "message": "Follow US-84 toward Pueblo"
+     },
+     {
+      "routeOffsetInMeters": 1341396,
+      "travelTimeInSeconds": 57961,
+      "point": {
+       "latitude": 39.7392,
+       "longitude": -104.9903
+      },
+      "pointIndex": 60,
+      "instructionType": "LOCATION_ARRIVAL",
+      "street": "",
+      "countryCode": "USA",
+      "junctionType": "REGULAR",
+      "turnAngleInDecimalDegrees": 0,
+      "possibleCombineWithNext": false,
+      "drivingSide": "RIGHT",
+      "maneuver": "ARRIVE",
+      "message": "Arrive at Denver"
+     }
+    ]
+   }
+  }
+ ]
+}

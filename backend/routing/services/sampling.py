@@ -5,10 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
-from .geo import Point, cumulative_distances, interpolate_point
-
-# Distances closer than this (miles) are treated as the same place.
-EPSILON_MILES = 1e-6
+from .geo import Point, cumulative_distances, interpolate_point, sample_miles
 
 TimePoint = tuple[float, float]  # (offset_miles, elapsed_seconds)
 
@@ -20,18 +17,6 @@ class Checkpoint:
     lon: float
     segment_miles: float  # distance since the previous checkpoint; 0 for the origin
     eta_utc: datetime
-
-
-def _checkpoint_miles(total_miles: float, interval_miles: float) -> list[float]:
-    """0, N, 2N, ... below the end, then the end itself (no duplicate on exact multiples)."""
-    miles = [0.0]
-    k = 1
-    while k * interval_miles < total_miles - EPSILON_MILES:
-        miles.append(k * interval_miles)
-        k += 1
-    if total_miles - miles[-1] > EPSILON_MILES:
-        miles.append(total_miles)
-    return miles
 
 
 def _elapsed_interpolator(
@@ -91,7 +76,7 @@ def build_checkpoints(
 
     checkpoints: list[Checkpoint] = []
     previous_mile = 0.0
-    for mile in _checkpoint_miles(total_miles, interval_miles):
+    for mile in sample_miles(total_miles, interval_miles):
         lat, lon = interpolate_point(coords, cum, mile)
         checkpoints.append(
             Checkpoint(
