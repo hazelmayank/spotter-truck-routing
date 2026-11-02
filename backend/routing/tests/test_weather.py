@@ -17,48 +17,18 @@ from routing.services.weather import (
     weather_at,
 )
 
-from .fakes import FakeResponse, FakeSession
+from .fakes import FakeResponse, FakeSession, location_body, serve_forecast
 
 NOW = datetime(2026, 11, 3, 12, 0, tzinfo=UTC)
 START = datetime(2026, 11, 3, 8, 0, tzinfo=UTC)
 END = START + timedelta(hours=4)
 FORECAST_END = datetime(2026, 11, 19, 0, 0, tzinfo=UTC)  # first hour with no forecast
-HOUR_FORMAT = "%Y-%m-%dT%H:%M"
 CENTRAL_STANDARD = timezone(timedelta(hours=-6))
 
 
 @pytest.fixture(autouse=True)
 def clear_cache() -> None:
     cache.clear()
-
-
-def location_body(lat: float, lon: float, params: dict[str, Any]) -> dict[str, Any]:
-    """One Open-Meteo location: wind = lat, gust = lon, rain 0.1 + showers 0.05, no snow."""
-    first = datetime.strptime(params["start_hour"], HOUR_FORMAT)
-    last = datetime.strptime(params["end_hour"], HOUR_FORMAT)
-    hours = [
-        first + timedelta(hours=h) for h in range(int((last - first).total_seconds() // 3600) + 1)
-    ]
-    return {
-        "latitude": lat,
-        "longitude": lon,
-        "hourly": {
-            "time": [hour.strftime(HOUR_FORMAT) for hour in hours],
-            "wind_speed_10m": [lat] * len(hours),
-            "wind_gusts_10m": [lon] * len(hours),
-            "rain": [0.1] * len(hours),
-            "showers": [0.05] * len(hours),
-            "snowfall": [0.0] * len(hours),
-        },
-    }
-
-
-def serve_forecast(params: dict[str, Any]) -> Any:
-    """Open-Meteo answers a list for several points and a bare object for a single one."""
-    lats = [float(lat) for lat in params["latitude"].split(",")]
-    lons = [float(lon) for lon in params["longitude"].split(",")]
-    locations = [location_body(lat, lon, params) for lat, lon in zip(lats, lons, strict=True)]
-    return locations if len(locations) > 1 else locations[0]
 
 
 def spread_points(count: int) -> list[Point]:

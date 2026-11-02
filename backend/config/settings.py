@@ -55,6 +55,14 @@ REST_FRAMEWORK = {
 
 CACHES = {"default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"}}
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {"plain": {"format": "%(asctime)s %(name)s %(message)s"}},
+    "handlers": {"console": {"class": "logging.StreamHandler", "formatter": "plain"}},
+    "loggers": {"routing": {"handlers": ["console"], "level": "INFO"}},
+}
+
 TIME_ZONE = "UTC"
 USE_TZ = True
 

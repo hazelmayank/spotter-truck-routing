@@ -34,6 +34,18 @@ One line per non-obvious decision.
 - Results are cached per point and hour range for 30 minutes in Django's local-memory cache, which is per process, so each gunicorn worker has its own copy.
 - Batches of up to 100 points run on at most 4 threads; a 429 or 5xx response is retried once after 0.5 s, other errors are not retried.
 
+## Recommendation and plan API
+
+- Miles per level are summed per route and rounded to 0.1 mi before ranking, so 4.04 and 4.01 mi of severe weather tie and the next criterion decides.
+- Average risk is the risk level weighted by segment miles, rounded to 3 decimals so float noise cannot break a tie that should fall through to travel time.
+- A route's `max_level` is taken over all checkpoints, including the origin, even though the origin owns 0 miles.
+- The explanation compares the recommended route with the runner-up and names the first criterion that differs, then adds how much slower it is than the fastest route.
+- The 422 status covers input the services understood but cannot satisfy (unknown place, no route, forecast out of range); 502 is for a routing or weather service that failed, with a generic message and the detail only in the log.
+- A departure without a timezone is rejected with 400, because DRF would otherwise silently read it in the server's timezone.
+- Weather for risk is fetched once for every checkpoint of every route, from the departure to the latest ETA, so the request count does not grow with the number of routes.
+- The geometry in the response is the simplified line; checkpoints, ETAs and weather are computed on the full-resolution line.
+- Weather gaps are counted as low risk and reported in `warnings`, as is a result with fewer than three routes.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).

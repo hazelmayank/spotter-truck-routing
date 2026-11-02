@@ -1,7 +1,5 @@
-import json
 from copy import deepcopy
 from datetime import UTC, datetime
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -10,24 +8,14 @@ from routing.services.geo import Point, cumulative_distances, haversine_miles, i
 from routing.services.routing import RouteOption, RoutingError, get_routes
 from routing.services.tomtom import TomTomError
 
-from .fakes import FakeTomTomClient
+from .fakes import FakeTomTomClient, fixture_routes
+from .fakes import routes_response as response
 
-FIXTURES = Path(__file__).parent / "fixtures"
 METERS_PER_MILE = 1609.344
 
 DALLAS = (32.7767, -96.797)
 DENVER = (39.7392, -104.9903)
 DEPARTURE = datetime(2026, 11, 3, 8, 0, tzinfo=UTC)
-
-
-def fixture_routes() -> list[dict[str, Any]]:
-    """Fastest first: US-287, then I-35/I-70 (+22% time), then US-84 (+35% time)."""
-    with (FIXTURES / "calculate_route_alternatives.json").open() as file:
-        return json.load(file)["routes"]
-
-
-def response(*routes: dict[str, Any]) -> dict[str, Any]:
-    return {"formatVersion": "0.0.12", "routes": list(routes)}
 
 
 def request_routes(client: FakeTomTomClient, load_lb: float = 40_000) -> list[RouteOption]:
