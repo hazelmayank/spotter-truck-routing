@@ -2,6 +2,15 @@
 
 One line per non-obvious decision.
 
+## Geometry and sampling
+
+- Distances use haversine with a 3958.8 mi earth radius; points within a segment are interpolated linearly in lat/lon, which is accurate for the short segments of a routing polyline.
+- Checkpoints sit at 0, N, 2N, ... below the route length, then the destination; an exact multiple of N does not get a duplicate destination checkpoint.
+- Each checkpoint's `segment_miles` is the distance back to the previous checkpoint (0 for the origin), so segment miles always sum to the polyline length.
+- Instruction time-point offsets are rescaled so the last one equals the polyline length, because the routing service and the geometry measure slightly different distances and the destination must still get the full travel time.
+- When time points are missing, ETAs fall back to distance-proportional time over a caller-supplied total duration (the same as a two-point `(0, 0)`, `(total, duration)` list); with neither, it is an error rather than a guess.
+- Departure must be timezone-aware and is normalised to UTC so every ETA is UTC.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).
