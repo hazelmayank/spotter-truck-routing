@@ -46,6 +46,17 @@ One line per non-obvious decision.
 - The geometry in the response is the simplified line; checkpoints, ETAs and weather are computed on the full-resolution line.
 - Weather gaps are counted as low risk and reported in `warnings`, as is a result with fewer than three routes.
 
+## Frontend data layer and form
+
+- Form field names match the API field names, so a 400 from the backend maps straight onto the input it is about; a 400 is never shown as a banner, while 422 and 502 messages are.
+- A server error is hidden as soon as its field is edited, since it described the value that was submitted.
+- The departure input is a `datetime-local` value, read as the browser's local time and converted with `toISOString()` on submit, so the backend always receives UTC.
+- Validation messages appear after a field is blurred or the form is submitted, not while the user is still typing the first time.
+- There is no autocomplete yet because the backend has no `/api/geocode` endpoint; the `suggest` service exists and only needs a thin view.
+- `HeatmapRequest` and `HeatmapResponse` in `types.ts` are a proposed contract, because `/api/heatmap` is not built yet; `useHeatmap` is not mounted in the app until it is.
+- `useHeatmap` sets `staleTime: Infinity` and no retries, so the 49 hours are fetched once per plan and the slider never triggers a request.
+- State stays in `App` (one mutation passed one level down), so no context or store is needed yet.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).
