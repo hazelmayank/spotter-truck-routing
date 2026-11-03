@@ -102,4 +102,42 @@ Things to know about the free plan:
 
 - The API sleeps after 15 minutes without requests, so the first request after a pause can take about a minute.
 - Open-Meteo's free tier counts every location as a request (about 600 a minute). The app keeps its forecast cache for 30 minutes and uses a coarser heatmap grid for wide corridors to stay inside that, but the cache is per process: each of the two gunicorn workers has its own.
+- Render's free instances share outbound IP addresses with other projects, and Open-Meteo's free tier limits requests per IP address. When that shared address uses up its daily limit, planning fails with a 502 until the next day. The next section moves the API to a server with its own address.
 - If the page shows "Could not reach the server", `VITE_API_BASE_URL` is wrong. If the browser console shows a CORS error, `CORS_ALLOWED_ORIGINS` does not match the address of the site. A "400 Bad Request" from the API means its host is missing from `ALLOWED_HOSTS`.
+
+### API on its own server (AWS EC2)
+
+This keeps the site on Render and runs the API on an Ubuntu 24.04 server with a fixed IP address of its own, so the Open-Meteo limit counts only this app. [deploy/setup.sh](deploy/setup.sh) installs gunicorn under systemd and Caddy, which gets a free HTTPS certificate. The browser blocks a plain `http` API from an `https` site, so HTTPS is required.
+
+1. In the AWS console, pick a region near you and open **EC2**, then **Launch instance**.
+2. Choose the **Ubuntu Server 24.04 LTS** image and the `t3.micro` type (or `t2.micro` if that is the free-tier one in your region).
+3. Create a key pair when asked and keep the downloaded `.pem` file.
+4. Under network settings, allow SSH, HTTP and HTTPS traffic. Port 80 must be open too, because the certificate is issued over it.
+5. Launch the instance. Then open **Elastic IPs**, click **Allocate Elastic IP address**, then **Associate** it with the instance. The address now stays the same after a restart.
+6. Turn the IP address into a host name by replacing the dots with dashes and adding `.sslip.io`. For `13.232.10.5` that is `13-232-10-5.sslip.io`.
+7. Connect: `ssh -i your-key.pem ubuntu@13.232.10.5`.
+8. On the server, clone the repository and create the settings file:
+
+   ```bash
+   git clone https://github.com/<your-user>/spotter-truck-routing.git
+   cd spotter-truck-routing
+   nano backend/.env
+   ```
+
+   ```
+   SECRET_KEY=<a long random string>
+   DEBUG=false
+   ALLOWED_HOSTS=13-232-10-5.sslip.io
+   CORS_ALLOWED_ORIGINS=https://spotter-truck-routing-web.onrender.com
+   TOMTOM_API_KEY=<your TomTom key>
+   ```
+
+   A secret key can be made with `python3 -c "import secrets; print(secrets.token_urlsafe(50))"`.
+9. Run the script with the host name from step 6: `bash deploy/setup.sh 13-232-10-5.sslip.io`. It takes a few minutes.
+10. Open `https://13-232-10-5.sslip.io/api/health`. It should show `{"status":"ok"}`. If the browser shows a certificate error, wait a minute and reload.
+11. In Render, open the site `spotter-truck-routing-web`, then **Environment**, and set `VITE_API_BASE_URL` to `https://13-232-10-5.sslip.io`. Then **Manual Deploy**, **Clear build cache & deploy**.
+12. Open the site and plan a trip. In the Render dashboard, suspend the old API service `spotter-truck-routing-api` so nothing calls it.
+
+To update the API after a change, run on the server: `cd spotter-truck-routing && git pull && sudo systemctl restart spotter-api`. If requirements changed, run `backend/.venv/bin/pip install -r backend/requirements.txt` before the restart. Logs: `sudo journalctl -u spotter-api -f`.
+
+AWS bills an instance and an Elastic IP address that is not attached to a running instance. Check the current free-tier terms for your account, set a billing alert, and release the Elastic IP when you delete the instance.

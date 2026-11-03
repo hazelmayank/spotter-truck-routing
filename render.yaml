@@ -37,7 +37,7 @@ services:
         value: 22.12.0
       # Read at build time, so changing it needs a new build of the site.
       - key: VITE_API_BASE_URL
-        value: https://spotter-truck-routing-api.onrender.com
+        sync: false
     routes:
       - type: rewrite
         source: /*

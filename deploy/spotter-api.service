@@ -1,0 +1,12 @@
+[Unit]
+Description=Weather-aware truck routing API
+After=network.target
+
+[Service]
+User=APP_USER
+WorkingDirectory=REPO_DIR/backend
+ExecStart=REPO_DIR/backend/.venv/bin/gunicorn config.wsgi --bind 127.0.0.1:8000 --workers 2 --timeout 60
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

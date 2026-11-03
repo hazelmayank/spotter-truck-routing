@@ -102,6 +102,9 @@ One line per non-obvious decision.
 - Test and lint tools live in `requirements-dev.txt`, so the deploy build installs only what the service runs.
 - There is no CORS default outside `DEBUG`: the allowed origins must be set, and Render's own hostname is added to the allowed hosts automatically.
 - The blueprint uses predictable service names for the two addresses it needs (`CORS_ALLOWED_ORIGINS`, `VITE_API_BASE_URL`); the README says how to fix them if Render has to rename a service.
+- The API can run on a server with its own IP address (`deploy/`), because Open-Meteo's free tier limits requests per IP and Render's free instances share outbound IPs, which exhausted the daily limit.
+- Caddy terminates TLS on that server with an `sslip.io` host name, since the HTTPS site cannot call a plain `http` API and a certificate needs a name rather than a bare IP.
+- `VITE_API_BASE_URL` is `sync: false` in the blueprint, so a blueprint sync cannot reset the address to a hardcoded one.
 - There is no HTTPS redirect or secure-cookie setting in Django, because Render ends TLS before the app and the API sets no cookies.
 
 ## Risk engine
