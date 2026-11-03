@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { formatDuration, formatLocalTime, formatMiles } from '../lib/format'
 import type { Route } from '../types'
 import { CheckpointList } from './CheckpointList'
@@ -16,7 +16,7 @@ interface RouteCardProps {
   onShowCheckpoint: (routeId: string, index: number) => void
 }
 
-export function RouteCard({
+export const RouteCard = memo(function RouteCard({
   route,
   recommended,
   selected,
@@ -48,7 +48,7 @@ export function RouteCard({
         <span className="flex items-center justify-between">
           <span className="font-semibold">
             Route {route.id}{' '}
-            <span className="text-xs font-normal text-slate-500">#{route.rank}</span>
+            <span className="text-xs font-normal text-slate-600">#{route.rank}</span>
           </span>
           {recommended && (
             <span className="rounded bg-blue-700 px-1.5 py-0.5 text-xs text-white">
@@ -96,4 +96,4 @@ export function RouteCard({
       )}
     </li>
   )
-}
+})

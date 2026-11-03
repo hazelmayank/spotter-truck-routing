@@ -86,6 +86,24 @@ One line per non-obvious decision.
 - Checkpoints always show the weather at their own ETA and never use the slider hour, so a checkpoint's color cannot change while the slider is scrubbed.
 - Moving the slider by hand pauses playback, and Play stops at the last hour and restarts from +0h if pressed there.
 
+## Frontend polish
+
+- The route and checkpoint hover state lives in `App`, so everything below it re-renders on a hover; the route cards, the form, the heatmap panel, the route lines and the legend are memoized, and the focus callbacks keep their identity until the plan changes, so only the hovered card and line re-render.
+- The focus updaters return before calling `setState` when nothing would change, because React still renders the host component once for a no-op update and the map reports hover on every mouse move.
+- The map module was already loaded lazily, so the entry bundle (about 88 KB gzipped) holds no map code; splitting it further was measured and not worth it.
+- On a phone the map gets the larger half of the screen and the legend becomes a two-row strip, because the panel and a column legend covered most of a 325 px map.
+- Every control has a visible focus ring (the hidden metric radios show it on their label), the heatmap controls are at least 24 px tall, and secondary text on tinted cards uses `slate-600` for contrast.
+- The slider's hour label does not announce itself (`aria-live="off"`), because the slider already reads the same text as its value text.
+- A trailing slash on `VITE_API_BASE_URL` is ignored, because a pasted address often has one.
+
+## Deployment
+
+- The API runs under gunicorn with two workers, so the weather cache is per worker and each worker may fetch a forecast the other already has.
+- Test and lint tools live in `requirements-dev.txt`, so the deploy build installs only what the service runs.
+- There is no CORS default outside `DEBUG`: the allowed origins must be set, and Render's own hostname is added to the allowed hosts automatically.
+- The blueprint uses predictable service names for the two addresses it needs (`CORS_ALLOWED_ORIGINS`, `VITE_API_BASE_URL`); the README says how to fix them if Render has to rename a service.
+- There is no HTTPS redirect or secure-cookie setting in Django, because Render ends TLS before the app and the API sets no cookies.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).

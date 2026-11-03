@@ -1,1 +1,17 @@
 @import 'tailwindcss';
+
+/* A clear ring for keyboard users on every control. The metric radios are visually hidden, so
+   their label shows the ring instead. */
+@layer base {
+  :where(button, input, select, textarea, a):focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+
+  /* Chrome puts the focus inside the date fields, so the input itself needs the ring. */
+  input[type='datetime-local']:focus-within,
+  label:has(> input[type='radio']:focus-visible) {
+    outline: 2px solid #2563eb;
+    outline-offset: 2px;
+  }
+}

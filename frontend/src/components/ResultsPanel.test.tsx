@@ -6,6 +6,18 @@ import { makeFocus } from '../test/focus'
 import { makeThreeRoutePlan } from '../test/helpers'
 import { ResultsPanel } from './ResultsPanel'
 
+// Each route card renders exactly one RiskBar, so its renders count the card's renders.
+const riskBarRenders = vi.hoisted(() => ({ count: 0 }))
+vi.mock('./RiskBar', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./RiskBar')>()
+  return {
+    RiskBar: (props: Parameters<typeof actual.RiskBar>[0]) => {
+      riskBarRenders.count += 1
+      return actual.RiskBar(props)
+    },
+  }
+})
+
 const plan = makeThreeRoutePlan()
 
 function setup(props: Partial<Parameters<typeof ResultsPanel>[0]> = {}) {
@@ -161,5 +173,51 @@ describe('results', () => {
     setup({ restoredAt: '2026-11-03T14:20:00Z' })
 
     expect(screen.getByText(/Showing the plan from/)).toBeInTheDocument()
+  })
+})
+
+describe('re-rendering', () => {
+  const panel = (focus: ReturnType<typeof makeFocus>) => (
+    <ResultsPanel plan={plan} error={null} isPending={false} focus={focus} onRetry={() => {}} />
+  )
+
+  it('hovering a route re-renders only that route card', () => {
+    const focus = makeFocus()
+    const { rerender } = render(panel(focus))
+    const before = riskBarRenders.count
+
+    rerender(panel({ ...focus, hoveredId: 'A' }))
+
+    expect(riskBarRenders.count - before).toBe(1)
+  })
+
+  it('moving the hover from one route to another re-renders just those two cards', () => {
+    const focus = makeFocus({ hoveredId: 'A' })
+    const { rerender } = render(panel(focus))
+    const before = riskBarRenders.count
+
+    rerender(panel({ ...focus, hoveredId: 'B' }))
+
+    expect(riskBarRenders.count - before).toBe(2)
+  })
+
+  it('re-rendering the panel with unchanged focus re-renders no route card', () => {
+    const focus = makeFocus({ selectedId: 'C' })
+    const { rerender } = render(panel(focus))
+    const before = riskBarRenders.count
+
+    rerender(panel({ ...focus }))
+
+    expect(riskBarRenders.count).toBe(before)
+  })
+
+  it('opening a checkpoint re-renders only the card of its route', () => {
+    const focus = makeFocus({ selectedId: 'A' })
+    const { rerender } = render(panel(focus))
+    const before = riskBarRenders.count
+
+    rerender(panel({ ...focus, checkpoint: { routeId: 'A', index: 1, source: 'map' } }))
+
+    expect(riskBarRenders.count - before).toBe(1)
   })
 })

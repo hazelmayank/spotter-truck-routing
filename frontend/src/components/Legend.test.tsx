@@ -33,3 +33,19 @@ it('colors each swatch with the risk color', () => {
     'rgb(59, 7, 100)',
   ])
 })
+
+it('names the risk levels in text, not only in color, in a labelled list', () => {
+  render(<Legend />)
+
+  const levels = within(screen.getByRole('list', { name: 'Checkpoint risk' })).getAllByRole(
+    'listitem',
+  )
+
+  expect(levels.map((item) => item.textContent)).toEqual([
+    'Low',
+    'Moderate',
+    'High',
+    'Severe',
+    'No travel',
+  ])
+})

@@ -67,3 +67,28 @@ describe('formatClockTime', () => {
     expect(formatClockTime('2026-11-03T20:30:00Z', 'Asia/Kolkata')).toContain('Wed')
   })
 })
+
+describe('edge cases', () => {
+  it('rounds a duration to the nearest minute, carrying into the hour', () => {
+    expect(formatDuration(3570)).toBe('1 h 0 min') // 59.5 minutes
+    expect(formatDuration(3569)).toBe('59 min')
+  })
+
+  it('shows one decimal for long distances', () => {
+    expect(formatMiles(1234.56)).toBe('1234.6 mi')
+  })
+
+  it('shows a zero measurement as zero, not as missing', () => {
+    expect(formatMeasure(0, 'mph')).toBe('0 mph')
+  })
+
+  it('formats a clock time without the month', () => {
+    expect(formatClockTime('2026-11-03T20:30:00Z', 'UTC')).not.toMatch(/Nov/)
+  })
+
+  it('formats the same instant differently in different timezones', () => {
+    const iso = '2026-11-03T20:30:00Z'
+
+    expect(formatLocalTime(iso, 'Asia/Tokyo')).not.toBe(formatLocalTime(iso, 'America/Chicago'))
+  })
+})

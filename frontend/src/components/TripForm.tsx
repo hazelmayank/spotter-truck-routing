@@ -1,4 +1,4 @@
-import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
+import { memo, useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import {
   INTERVAL_OPTIONS,
   MAX_LOAD_LB,
@@ -23,7 +23,11 @@ const INPUT_CLASS =
   'rounded border border-slate-300 px-2 py-1.5 text-sm aria-[invalid=true]:border-red-600'
 const FIELDS: TripField[] = ['origin', 'destination', 'departure', 'load_lb', 'interval_miles']
 
-export function TripForm({ isPending, serverErrors = {}, onSubmit }: TripFormProps) {
+export const TripForm = memo(function TripForm({
+  isPending,
+  serverErrors = {},
+  onSubmit,
+}: TripFormProps) {
   const [values, setValues] = useState<TripValues>(() => loadTripValues() ?? initialTripValues())
   const [touched, setTouched] = useState<ReadonlySet<TripField>>(new Set())
   const [submitted, setSubmitted] = useState<TripValues | null>(null)
@@ -104,4 +108,4 @@ export function TripForm({ isPending, serverErrors = {}, onSubmit }: TripFormPro
       </div>
     </form>
   )
-}
+})

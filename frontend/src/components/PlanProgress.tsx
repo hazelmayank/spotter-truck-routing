@@ -25,7 +25,7 @@ export function PlanProgress() {
         {PLACEHOLDER_CARDS.map((placeholder) => (
           <li
             key={placeholder}
-            className="h-36 animate-pulse rounded border border-slate-200 bg-slate-100"
+            className="h-36 animate-pulse motion-reduce:animate-none rounded border border-slate-200 bg-slate-100"
           />
         ))}
       </ul>

@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { formatLocalTime, formatMeasure } from '../lib/format'
 import type { Checkpoint } from '../types'
 import { LevelBadge } from './LevelBadge'
@@ -7,7 +8,10 @@ interface CheckpointPopupProps {
   checkpoint: Checkpoint
 }
 
-export function CheckpointPopup({ routeId, checkpoint }: CheckpointPopupProps) {
+export const CheckpointPopup = memo(function CheckpointPopup({
+  routeId,
+  checkpoint,
+}: CheckpointPopupProps) {
   const { wind_mph, gust_mph, rain_in_hr, snow_in_hr } = checkpoint
   const wind =
     wind_mph !== null && gust_mph !== null
@@ -40,4 +44,4 @@ export function CheckpointPopup({ routeId, checkpoint }: CheckpointPopupProps) {
       )}
     </div>
   )
-}
+})

@@ -38,7 +38,7 @@ export function HeatmapSlider({ start, hours }: HeatmapSliderProps) {
         type="button"
         onClick={togglePlaying}
         aria-label={playing ? 'Pause' : 'Play'}
-        className="w-8 shrink-0 rounded border border-slate-300 bg-white py-1 text-sm"
+        className="size-9 shrink-0 rounded border border-slate-300 bg-white text-sm"
       >
         {playing ? '❚❚' : '▶'}
       </button>
@@ -54,9 +54,12 @@ export function HeatmapSlider({ start, hours }: HeatmapSliderProps) {
         }}
         aria-label="Forecast hour"
         aria-valuetext={label}
-        className="min-w-0 flex-1"
+        className="h-6 min-w-0 flex-1 cursor-pointer accent-blue-700"
       />
-      <output className="w-36 shrink-0 text-xs font-medium text-slate-700">{label}</output>
+      {/* The slider announces its own value text, so this must not repeat it on every step. */}
+      <output aria-live="off" className="w-36 shrink-0 text-xs font-medium text-slate-700">
+        {label}
+      </output>
     </div>
   )
 }

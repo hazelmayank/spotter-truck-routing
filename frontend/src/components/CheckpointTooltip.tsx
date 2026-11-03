@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { formatClockTime, formatMeasure } from '../lib/format'
 import type { Checkpoint } from '../types'
 import { LevelBadge } from './LevelBadge'
@@ -8,7 +9,10 @@ interface CheckpointTooltipProps {
 }
 
 /** The short version of the checkpoint popup, shown while hovering a checkpoint. */
-export function CheckpointTooltip({ routeId, checkpoint }: CheckpointTooltipProps) {
+export const CheckpointTooltip = memo(function CheckpointTooltip({
+  routeId,
+  checkpoint,
+}: CheckpointTooltipProps) {
   const { wind_mph, rain_in_hr, snow_in_hr } = checkpoint
 
   return (
@@ -25,4 +29,4 @@ export function CheckpointTooltip({ routeId, checkpoint }: CheckpointTooltipProp
       </p>
     </div>
   )
-}
+})

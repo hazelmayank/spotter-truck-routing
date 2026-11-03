@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { useHeatmapControl, useHeatmapStore } from '../hooks/useHeatmapControls'
 import { METRICS, METRIC_ORDER } from '../lib/heatmap'
 import type { HeatmapResponse } from '../types'
@@ -11,7 +12,11 @@ interface HeatmapPanelProps {
 
 const CHIP_CLASS = 'w-fit rounded-full bg-white/95 px-3 py-1 text-xs text-slate-700 shadow'
 
-export function HeatmapPanel({ data, isLoading, error }: HeatmapPanelProps) {
+export const HeatmapPanel = memo(function HeatmapPanel({
+  data,
+  isLoading,
+  error,
+}: HeatmapPanelProps) {
   if (isLoading) {
     return (
       <div className="absolute top-3 left-3">
@@ -41,7 +46,7 @@ export function HeatmapPanel({ data, isLoading, error }: HeatmapPanelProps) {
       <HeatmapSlider start={data.start} hours={data.hours} />
     </section>
   )
-}
+})
 
 /** Metric and visibility; it never reads the hour, so scrubbing does not re-render it. */
 function HeatmapOptions() {
@@ -50,13 +55,13 @@ function HeatmapOptions() {
   const visible = useHeatmapControl('visible')
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between gap-2">
         <div role="radiogroup" aria-label="Heatmap metric" className="flex gap-1">
           {METRIC_ORDER.map((option) => (
             <label
               key={option}
-              className={`cursor-pointer rounded border px-2 py-0.5 text-xs ${
+              className={`cursor-pointer rounded border px-2.5 py-1.5 text-xs ${
                 option === metric
                   ? 'border-blue-700 bg-blue-700 text-white'
                   : 'border-slate-300 bg-white text-slate-700'
@@ -74,16 +79,17 @@ function HeatmapOptions() {
             </label>
           ))}
         </div>
-        <label className="flex items-center gap-1 text-xs text-slate-700">
+        <label className="flex min-h-8 cursor-pointer items-center gap-1.5 px-1 text-xs text-slate-700">
           <input
             type="checkbox"
             checked={visible}
             onChange={(event) => store.setVisible(event.target.checked)}
+            className="size-4"
           />
           Show
         </label>
       </div>
-      <p className="text-xs text-slate-500">{METRICS[metric].scale}</p>
+      <p className="text-xs text-slate-600">{METRICS[metric].scale}</p>
     </div>
   )
 }

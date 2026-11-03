@@ -38,6 +38,18 @@ vi.mock('./components/MapView', () => ({
   ),
 }))
 
+// Each form field renders one Field, so its renders count the form's renders.
+const fieldRenders = vi.hoisted(() => ({ count: 0 }))
+vi.mock('./components/Field', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./components/Field')>()
+  return {
+    Field: (props: Parameters<typeof actual.Field>[0]) => {
+      fieldRenders.count += 1
+      return actual.Field(props)
+    },
+  }
+})
+
 // The heatmap request is stubbed so the plan tests keep counting only their own requests.
 const heatmapQuery = vi.hoisted(() => ({
   state: { data: undefined, isLoading: false, error: null } as {
@@ -355,4 +367,19 @@ it('moving the slider does not touch the plan results', async () => {
 
   expect(screen.getByTestId('map')).toHaveAttribute('data-selected', 'A')
   expect(screen.getByRole('button', { name: /^Route A/ })).toHaveAttribute('aria-pressed', 'true')
+})
+
+it('does not re-render the form when only the hovered route changes', async () => {
+  stubFetch(jsonResponse(plan))
+  const user = await planSampleTrip()
+  const cardA = await screen.findByRole('button', { name: /^Route A/ })
+  const cardB = screen.getByRole('button', { name: /^Route B/ })
+  await user.hover(cardA)
+  const before = fieldRenders.count
+
+  await user.hover(cardB)
+  await user.unhover(cardB)
+  await user.hover(cardA)
+
+  expect(fieldRenders.count).toBe(before)
 })

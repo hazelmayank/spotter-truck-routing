@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react'
 import type { ApiError } from '../api/client'
 import type { RouteFocus } from '../hooks/useRouteFocus'
 import type { PlanResponse } from '../types'
@@ -22,12 +23,19 @@ export function ResultsPanel({
   focus,
   onRetry,
 }: ResultsPanelProps) {
+  const byRank = useMemo(() => [...(plan?.routes ?? [])].sort((a, b) => a.rank - b.rank), [plan])
+  // A stable function, so a route card (which is memoized) re-renders only when its own props do.
+  const { showCheckpoint } = focus
+  const showCheckpointFromList = useCallback(
+    (routeId: string, index: number) => showCheckpoint({ routeId, index, source: 'list' }),
+    [showCheckpoint],
+  )
+
   if (isPending) return <PlanProgress />
   // A 400 is shown next to the form fields it is about.
   if (error && error.status !== 400) return <ErrorState message={error.message} onRetry={onRetry} />
   if (!plan) return <EmptyState />
 
-  const byRank = [...plan.routes].sort((a, b) => a.rank - b.rank)
   return (
     <div className="flex flex-col gap-3">
       <RecommendationBanner plan={plan} restoredAt={restoredAt} />
@@ -44,9 +52,7 @@ export function ResultsPanel({
             }
             onHover={focus.hover}
             onSelect={focus.select}
-            onShowCheckpoint={(routeId, index) =>
-              focus.showCheckpoint({ routeId, index, source: 'list' })
-            }
+            onShowCheckpoint={showCheckpointFromList}
           />
         ))}
       </ul>

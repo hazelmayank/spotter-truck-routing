@@ -786,3 +786,61 @@ describe('moving the heatmap slider', () => {
     expect(mock.layers.heatmap.layout).toEqual({ visibility: 'none' })
   })
 })
+
+describe('re-rendering the route lines', () => {
+  it('hovering a route re-renders only its own line', () => {
+    const { rerender } = render(<MapView {...baseProps} plan={plan} />)
+    const before = { ...mock.layerRenders }
+
+    rerender(<MapView {...baseProps} plan={plan} hoveredId="A" />)
+
+    expect(mock.layerRenders['route-A']).toBeGreaterThan(before['route-A'])
+    expect(mock.layerRenders['route-B']).toBe(before['route-B'])
+    expect(mock.layerRenders['route-C']).toBe(before['route-C'])
+  })
+
+  it('opening a popup re-renders no route line', () => {
+    const { rerender } = render(<MapView {...baseProps} plan={plan} />)
+    const before = { ...mock.layerRenders }
+
+    rerender(
+      <MapView {...baseProps} plan={plan} checkpoint={{ routeId: 'A', index: 1, source: 'map' }} />,
+    )
+
+    for (const id of ['route-A', 'route-B', 'route-C']) {
+      expect(mock.layerRenders[id]).toBe(before[id])
+    }
+  })
+
+  it('selecting a route re-renders every line, since the others fade', () => {
+    const { rerender } = render(<MapView {...baseProps} plan={plan} />)
+    const before = { ...mock.layerRenders }
+
+    rerender(<MapView {...baseProps} plan={plan} selectedId="A" />)
+
+    for (const id of ['route-A', 'route-B', 'route-C']) {
+      expect(mock.layerRenders[id]).toBeGreaterThan(before[id])
+    }
+  })
+
+  it('hands the map the same list of clickable layers every time', () => {
+    const { rerender } = render(<MapView {...baseProps} plan={plan} />)
+    const first = mock.mapProps!.interactiveLayerIds
+
+    rerender(<MapView {...baseProps} plan={plan} hoveredId="B" />)
+
+    expect(mock.mapProps!.interactiveLayerIds).toBe(first)
+  })
+
+  it('hands the map the same event handlers while the callbacks it got stay the same', () => {
+    const handlers = { onHover: vi.fn(), onSelect: vi.fn(), onCheckpoint: vi.fn() }
+    const { rerender } = render(<MapView {...baseProps} {...handlers} plan={plan} />)
+    const first = { ...mock.mapProps! }
+
+    rerender(<MapView {...baseProps} {...handlers} plan={plan} hoveredId="B" />)
+
+    expect(mock.mapProps!.onClick).toBe(first.onClick)
+    expect(mock.mapProps!.onMouseMove).toBe(first.onMouseMove)
+    expect(mock.mapProps!.onMouseLeave).toBe(first.onMouseLeave)
+  })
+})
