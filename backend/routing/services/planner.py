@@ -2,8 +2,7 @@
 
 import logging
 import time
-from collections.abc import Iterator, Sequence
-from contextlib import contextmanager
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
@@ -12,6 +11,7 @@ from .recommend import Candidate, RouteSummary, explain, rank_routes, summarize,
 from .risk import CheckpointRisk, assess_checkpoint
 from .routing import MAX_ROUTES, RouteOption, get_routes
 from .sampling import Checkpoint, build_checkpoints
+from .timing import timed_stage
 from .tomtom import TomTomClient
 from .weather import HourlySeries, HourlyWeather, OpenMeteoClient, weather_at
 
@@ -60,17 +60,19 @@ class TripPlan:
     recommended_route_id: str
     explanation: str
     warnings: list[str]
+    departure_utc: datetime
+    load_lb: float
 
 
 def plan_trip(request: PlanRequest) -> TripPlan:
     started = time.perf_counter()
     tomtom, open_meteo = TomTomClient(), OpenMeteoClient()
 
-    with _stage("geocode"):
+    with timed_stage(logger, "plan", "geocode"):
         origin = geocode(request.origin, tomtom)
         destination = geocode(request.destination, tomtom)
 
-    with _stage("routing"):
+    with timed_stage(logger, "plan", "routing"):
         options = get_routes(
             (origin.lat, origin.lon),
             (destination.lat, destination.lon),
@@ -79,7 +81,7 @@ def plan_trip(request: PlanRequest) -> TripPlan:
             tomtom,
         )
 
-    with _stage("checkpoints"):
+    with timed_stage(logger, "plan", "checkpoints"):
         checkpoint_lists = [
             build_checkpoints(
                 option.coords, request.interval_miles, request.departure_utc, option.time_points
@@ -87,10 +89,10 @@ def plan_trip(request: PlanRequest) -> TripPlan:
             for option in options
         ]
 
-    with _stage("weather"):
+    with timed_stage(logger, "plan", "weather"):
         forecasts = _forecasts_by_route(open_meteo, checkpoint_lists, request.departure_utc)
 
-    with _stage("risk"):
+    with timed_stage(logger, "plan", "risk"):
         planned = [
             _assess_route(checkpoints, forecast, request.load_lb)
             for checkpoints, forecast in zip(checkpoint_lists, forecasts, strict=True)
@@ -120,16 +122,9 @@ def plan_trip(request: PlanRequest) -> TripPlan:
         recommended_route_id=ranked[0].id,
         explanation=explain(ranked),
         warnings=[*warnings_for(ranked), *_data_warnings(routes)],
+        departure_utc=request.departure_utc,
+        load_lb=request.load_lb,
     )
-
-
-@contextmanager
-def _stage(name: str) -> Iterator[None]:
-    started = time.perf_counter()
-    try:
-        yield
-    finally:
-        logger.info("plan stage=%s ms=%.0f", name, (time.perf_counter() - started) * 1000)
 
 
 def _forecasts_by_route(

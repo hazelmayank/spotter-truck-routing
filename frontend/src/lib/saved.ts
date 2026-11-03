@@ -63,6 +63,8 @@ function isSavedPlan(value: unknown): value is SavedPlan {
   const plan = value.plan
   return (
     Array.isArray(plan.routes) &&
+    typeof plan.departure === 'string' &&
+    typeof plan.load_lb === 'number' &&
     Array.isArray(plan.warnings) &&
     typeof plan.recommended_route_id === 'string' &&
     typeof plan.explanation === 'string' &&

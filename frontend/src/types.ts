@@ -59,9 +59,12 @@ export interface PlanResponse {
   explanation: string
   warnings: string[]
   routes: Route[]
+  departure: string // the departure the plan was made for, UTC ISO 8601
+  load_lb: number // the load it was made for
 }
 
-// Proposed contract: POST /api/heatmap does not exist on the backend yet.
+export type HeatmapMetric = 'risk' | 'wind' | 'rain' | 'snow'
+
 export interface HeatmapRequest {
   routes: { id: string; geometry: LineStringGeometry }[]
   departure: string
@@ -71,11 +74,17 @@ export interface HeatmapRequest {
 export interface HeatmapPoint {
   lat: number
   lon: number
-  level: RiskLevel[] // one entry per forecast hour, 0 to 48 hours after `start`
+  // One value per forecast hour, starting at the response's `start`.
+  risk: number[] // risk level 0 to 4
+  wind_mph: number[]
+  rain_in_hr: number[]
+  snow_in_hr: number[]
 }
 
 export interface HeatmapResponse {
   start: string // UTC ISO 8601, the first forecast hour
+  hours: number // normally 49 (+0h to +48h), fewer near the end of the forecast horizon
+  step_deg: number // spacing of the grid points, in degrees
   points: HeatmapPoint[]
 }
 

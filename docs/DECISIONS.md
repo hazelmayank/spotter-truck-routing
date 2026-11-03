@@ -70,6 +70,22 @@ One line per non-obvious decision.
 - Hover and selection reset when a new plan arrives, by tying them to the plan object instead of clearing them in an effect.
 - The map module is loaded lazily so the form is usable before the map library (about 300 kB gzipped) has downloaded.
 
+## Heatmap
+
+- The heatmap grid uses 0.25 degree cells (about 17 mi) within one cell of each route, and falls back to 0.5 degrees above 400 points, because Open-Meteo's free tier counts every location as a call (600 a minute).
+- Grid points sit on exact multiples of the cell size, so the weather client's 2-decimal rounding and its cache keys cannot move them.
+- The heatmap range stops at the forecast horizon instead of failing, so `hours` can be below 49 and the slider follows it.
+- Django's local-memory cache holds 10,000 entries, because the default of 300 is smaller than one heatmap and made repeat requests refetch and hit the rate limit.
+- The heatmap response is gzipped, which shrinks its 49-hour series about 9 times.
+- The plan response echoes `departure` and `load_lb`, so a heatmap can be requested for a plan restored after a refresh.
+- Heatmap risk reuses the checkpoint classify functions and load rules, and missing weather counts as calm.
+- The slider hour lives in an external store read only by the slider and the heatmap layer, so dragging never re-renders `MapView`, its route and checkpoint layers, or the sidebar.
+- Each slider move causes one frame-throttled paint update with the same GeoJSON object, so only `heatmap-weight` changes and no data is re-sent to the map.
+- Wind, rain and snow weights are scaled to the no-travel thresholds (55 mph, 1 in/hr, 3 in/hr) and risk to 4, each capped at 1, with missing values as 0.
+- The heatmap layer is created before the route layers, so it sits below the route lines without a `beforeId`.
+- Checkpoints always show the weather at their own ETA and never use the slider hour, so a checkpoint's color cannot change while the slider is scrubbed.
+- Moving the slider by hand pauses playback, and Play stops at the last hour and restarts from +0h if pressed there.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).

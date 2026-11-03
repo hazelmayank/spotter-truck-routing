@@ -142,6 +142,15 @@ def weather_at(series: HourlySeries, eta_utc: datetime) -> HourlyWeather:
     )
 
 
+def last_forecast_hour(now: datetime) -> datetime:
+    """The last hour the forecast covers: the hour before 16 days after the start of today."""
+    return _start_of_day(now) + timedelta(days=FORECAST_DAYS) - timedelta(hours=1)
+
+
+def _start_of_day(moment: datetime) -> datetime:
+    return moment.astimezone(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
 def _hour_range(start_utc: datetime, end_utc: datetime, now: datetime) -> tuple[datetime, datetime]:
     """Whole-hour start and end, checked against the days the forecast covers."""
     if start_utc.tzinfo is None or end_utc.tzinfo is None:
@@ -155,8 +164,8 @@ def _hour_range(start_utc: datetime, end_utc: datetime, now: datetime) -> tuple[
         timedelta(hours=1) if end.minute or end.second or end.microsecond else timedelta()
     )
 
-    today = now.astimezone(UTC).replace(hour=0, minute=0, second=0, microsecond=0)
-    forecast_end = today + timedelta(days=FORECAST_DAYS)
+    today = _start_of_day(now)
+    forecast_end = last_forecast_hour(now) + timedelta(hours=1)
     if start < today:
         raise ForecastRangeError(
             f"Forecasts start today ({today:%Y-%m-%d} UTC); "

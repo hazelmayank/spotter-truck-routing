@@ -1,8 +1,11 @@
-import { act, render, screen, within } from '@testing-library/react'
-import type { ReactNode } from 'react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { act, render as renderBare, screen, within } from '@testing-library/react'
+import type { ReactElement, ReactNode } from 'react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { HeatmapStoreContext } from '../hooks/useHeatmapControls'
+import { heatmapGeoJson, heatmapRadius, heatmapWeight } from '../lib/heatmap'
 import { LEVEL_COLOR_EXPRESSION, planBounds } from '../lib/mapData'
-import { makePlan, makeThreeRoutePlan } from '../test/helpers'
+import { createHeatmapStore, type HeatmapStore } from '../store/heatmapStore'
+import { makeHeatmapResponse, makePlan, makeThreeRoutePlan } from '../test/helpers'
 import type { CheckpointTarget, PlanResponse } from '../types'
 import MapView from './MapView'
 
@@ -29,6 +32,7 @@ interface LayerProps {
   id: string
   type: string
   filter?: unknown
+  layout?: Record<string, unknown>
   paint: Record<string, unknown>
 }
 
@@ -45,6 +49,8 @@ const mock = vi.hoisted(() => ({
   mapProps: null as MapProps | null,
   layers: {} as Record<string, LayerProps>,
   sources: {} as Record<string, FeatureCollectionData>,
+  mapRenders: 0,
+  layerRenders: {} as Record<string, number>,
   fitBounds: vi.fn(),
   flyTo: vi.fn(),
   getZoom: vi.fn(() => 5),
@@ -69,6 +75,7 @@ vi.mock('react-map-gl/maplibre', async () => {
       onLoad?.()
     })
     mock.mapProps = props
+    mock.mapRenders += 1
     return <div data-testid="map">{props.children}</div>
   })
   return {
@@ -93,6 +100,7 @@ vi.mock('react-map-gl/maplibre', async () => {
     Layer: (props: LayerProps & { source?: string }) => {
       if (!props.source) throw new Error(`layer ${props.id} has no source`)
       mock.layers[props.id] = props
+      mock.layerRenders[props.id] = (mock.layerRenders[props.id] ?? 0) + 1
       return <div data-testid={`layer-${props.id}`} />
     },
     Popup: ({ children, onClose, className, longitude, latitude }: PopupProps) => (
@@ -109,6 +117,13 @@ vi.mock('react-map-gl/maplibre', async () => {
 })
 
 const plan = makeThreeRoutePlan()
+const heatmapData = heatmapGeoJson(makeHeatmapResponse())
+
+let store: HeatmapStore
+const render = (ui: ReactElement) =>
+  renderBare(ui, {
+    wrapper: ({ children }) => <HeatmapStoreContext value={store}>{children}</HeatmapStoreContext>,
+  })
 
 const noop = () => {}
 const baseProps = {
@@ -122,6 +137,9 @@ const baseProps = {
 }
 
 beforeEach(() => {
+  store = createHeatmapStore()
+  mock.mapRenders = 0
+  mock.layerRenders = {}
   mock.mapProps = null
   mock.layers = {}
   mock.sources = {}
@@ -623,5 +641,148 @@ describe('hovering a checkpoint', () => {
     rerender(<MapView {...baseProps} plan={makeThreeRoutePlan()} />)
 
     expect(screen.queryByTestId('tooltip')).not.toBeInTheDocument()
+  })
+})
+
+describe('the heatmap layer', () => {
+  it('is drawn below the route lines and the checkpoints', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+
+    const order = screen.getAllByTestId(/^layer-/).map((element) => element.dataset.testid)
+
+    expect(order[0]).toBe('layer-heatmap')
+    expect(order.indexOf('layer-heatmap')).toBeLessThan(order.indexOf('layer-route-hit'))
+    expect(order.indexOf('layer-heatmap')).toBeLessThan(order.indexOf('layer-checkpoints'))
+  })
+
+  it('is a heatmap layer over the data it is given', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+
+    expect(mock.layers.heatmap.type).toBe('heatmap')
+    expect(mock.sources.heatmap).toBe(heatmapData)
+  })
+
+  it('sizes the glow from the grid step it is given', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} heatmapStepDeg={0.5} />)
+
+    expect(mock.layers.heatmap.paint['heatmap-radius']).toEqual(heatmapRadius(0.5))
+  })
+
+  it('assumes a quarter degree grid until it knows better', () => {
+    render(<MapView {...baseProps} plan={plan} />)
+
+    expect(mock.layers.heatmap.paint['heatmap-radius']).toEqual(heatmapRadius(0.25))
+  })
+
+  it('is there but empty before a heatmap has loaded', () => {
+    render(<MapView {...baseProps} plan={plan} />)
+
+    expect(mock.sources.heatmap.features).toEqual([])
+  })
+
+  it('shows the risk of the first hour at first', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+
+    expect(mock.layers.heatmap.paint['heatmap-weight']).toEqual(heatmapWeight('risk', 0))
+  })
+})
+
+describe('moving the heatmap slider', () => {
+  const FRAME_MS = 16
+  const OTHER_LAYERS = [
+    'route-hit',
+    'route-A',
+    'route-B',
+    'route-C',
+    'checkpoint-hit',
+    'checkpoints',
+    'endpoints',
+  ]
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['requestAnimationFrame', 'cancelAnimationFrame'] })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  const settle = () => act(() => vi.advanceTimersByTime(FRAME_MS))
+
+  it('re-renders only the heatmap layer, through all 48 hours', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+    settle()
+    const layerRenders = { ...mock.layerRenders }
+    const mapRenders = mock.mapRenders
+
+    for (let hour = 1; hour <= 48; hour++) {
+      act(() => store.setHour(hour))
+      settle()
+    }
+
+    expect(mock.mapRenders).toBe(mapRenders) // MapView itself did not re-render
+    for (const id of OTHER_LAYERS) {
+      expect(mock.layerRenders[id]).toBe(layerRenders[id]) // no route or checkpoint layer did
+    }
+    expect(mock.layerRenders.heatmap).toBeGreaterThan(layerRenders.heatmap)
+    expect(mock.layers.heatmap.paint['heatmap-weight']).toEqual(heatmapWeight('risk', 48))
+  })
+
+  it('never hands the map new data: every source object stays the same', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+    settle()
+    const sources = { ...mock.sources }
+
+    for (const hour of [4, 17, 33, 48]) {
+      act(() => store.setHour(hour))
+      settle()
+    }
+
+    for (const id of ['heatmap', 'routes', 'checkpoints', 'endpoints']) {
+      expect(mock.sources[id]).toBe(sources[id])
+    }
+  })
+
+  it('updates the heatmap once per frame however fast the slider moves', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+    settle()
+    const before = mock.layerRenders.heatmap
+
+    act(() => {
+      for (let hour = 1; hour <= 40; hour++) store.setHour(hour)
+    })
+    settle()
+
+    expect(mock.layerRenders.heatmap - before).toBeLessThanOrEqual(2)
+    expect(mock.layers.heatmap.paint['heatmap-weight']).toEqual(heatmapWeight('risk', 40))
+  })
+
+  it('changes only the weight of the heatmap paint', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+    settle()
+    const first = mock.layers.heatmap.paint
+
+    act(() => store.setHour(20))
+    settle()
+
+    for (const key of ['heatmap-radius', 'heatmap-intensity', 'heatmap-color', 'heatmap-opacity']) {
+      expect(mock.layers.heatmap.paint[key]).toBe(first[key])
+    }
+  })
+
+  it('switching the metric or hiding the heatmap does not re-render the other layers either', () => {
+    render(<MapView {...baseProps} plan={plan} heatmap={heatmapData} />)
+    settle()
+    const layerRenders = { ...mock.layerRenders }
+    const mapRenders = mock.mapRenders
+
+    act(() => store.setMetric('wind'))
+    act(() => store.setVisible(false))
+    settle()
+
+    expect(mock.mapRenders).toBe(mapRenders)
+    for (const id of OTHER_LAYERS) expect(mock.layerRenders[id]).toBe(layerRenders[id])
+    expect(mock.layers.heatmap.paint['heatmap-weight']).toEqual(heatmapWeight('wind', 0))
+    expect(mock.layers.heatmap.layout).toEqual({ visibility: 'none' })
   })
 })

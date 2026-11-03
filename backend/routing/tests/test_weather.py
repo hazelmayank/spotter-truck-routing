@@ -352,3 +352,15 @@ def test_weather_at_ignores_the_timezone_of_the_eta() -> None:
 def test_weather_at_outside_the_series_is_an_error(offset: timedelta) -> None:
     with pytest.raises(ForecastRangeError, match="does not cover"):
         weather_at(hourly_series(), START + offset)
+
+
+def test_a_forecast_for_hundreds_of_points_fits_in_the_cache() -> None:
+    session = FakeSession(serve_forecast)
+    points = spread_points(900)
+    fetch(points, session)
+    requests_after_first_call = len(session.requests)
+
+    fetch(points, session)
+
+    assert requests_after_first_call == 9
+    assert len(session.requests) == requests_after_first_call

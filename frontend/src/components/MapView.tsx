@@ -1,3 +1,4 @@
+import type { FeatureCollection } from 'geojson'
 import { setWorkerUrl } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
@@ -10,6 +11,7 @@ import MapGL, {
   type MapLayerMouseEvent,
   type MapRef,
 } from 'react-map-gl/maplibre'
+import { DEFAULT_GRID_STEP_DEG } from '../lib/heatmap'
 import {
   CHECKPOINT_HIT_LAYER_ID,
   CHECKPOINT_HIT_RADIUS_PX,
@@ -28,6 +30,7 @@ import {
 import type { Checkpoint, CheckpointTarget, PlanResponse, Route } from '../types'
 import { CheckpointPopup } from './CheckpointPopup'
 import { CheckpointTooltip } from './CheckpointTooltip'
+import { HeatmapLayer } from './HeatmapLayer'
 import { Legend } from './Legend'
 
 // maplibre finds its worker file by name at runtime, which Vite neither emits in a build nor
@@ -48,6 +51,8 @@ interface MapViewProps {
   hoveredId: string | null
   selectedId: string | null
   checkpoint: CheckpointTarget | null
+  heatmap?: FeatureCollection // built once per heatmap response; never rebuilt for the slider
+  heatmapStepDeg?: number
   onHover: (routeId: string | null) => void
   onSelect: (routeId: string | null) => void
   onCheckpoint: (target: CheckpointTarget | null) => void
@@ -64,6 +69,8 @@ export default function MapView({
   hoveredId,
   selectedId,
   checkpoint,
+  heatmap,
+  heatmapStepDeg = DEFAULT_GRID_STEP_DEG,
   onHover,
   onSelect,
   onCheckpoint,
@@ -170,6 +177,9 @@ export default function MapView({
         onMouseLeave={handleMouseLeave}
       >
         <NavigationControl position="top-right" showCompass={false} />
+
+        {/* Declared first so it is created first and so sits below the route lines. */}
+        <HeatmapLayer data={heatmap ?? EMPTY_COLLECTION} stepDeg={heatmapStepDeg} />
 
         <Source id={ROUTES_SOURCE_ID} type="geojson" data={routesData}>
           <Layer

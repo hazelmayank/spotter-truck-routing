@@ -6,12 +6,19 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 
 from routing.services.geocoding import GeocodingError
+from routing.services.heatmap import build_heatmap
 from routing.services.planner import PlanRequest, plan_trip
 from routing.services.routing import RoutingError
 from routing.services.tomtom import TomTomError
 from routing.services.weather import ForecastRangeError, WeatherError
 
-from .serializers import PlanRequestSerializer, plan_response
+from .serializers import (
+    HeatmapRequestSerializer,
+    PlanRequestSerializer,
+    heatmap_response,
+    plan_response,
+    route_lines,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -52,3 +59,20 @@ def plan(request: Request) -> Response:
 def _upstream_failure(service: str) -> Response:
     message = f"The {service} service is not responding. Please try again in a moment."
     return Response({"error": message}, status=status.HTTP_502_BAD_GATEWAY)
+
+
+@api_view(["POST"])
+def heatmap(request: Request) -> Response:
+    serializer = HeatmapRequestSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    data = serializer.validated_data
+
+    try:
+        result = build_heatmap(route_lines(data["routes"]), data["departure"], data["load_lb"])
+    except ForecastRangeError as exc:
+        return Response({"error": str(exc)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    except WeatherError:
+        logger.exception("weather service failed")
+        return _upstream_failure("weather")
+
+    return Response(heatmap_response(result))

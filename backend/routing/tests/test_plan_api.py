@@ -124,6 +124,8 @@ def test_response_has_the_documented_shape(monkeypatch: pytest.MonkeyPatch) -> N
         "explanation",
         "warnings",
         "routes",
+        "departure",
+        "load_lb",
     }
     assert body["origin"] == {"label": "Dallas, TX", "lat": 32.7767, "lon": -96.797}
     assert body["destination"]["label"] == "Denver, CO"
@@ -406,3 +408,14 @@ def test_each_stage_is_logged_with_its_timing(
     for stage in ("geocode", "routing", "checkpoints", "weather", "risk"):
         assert any(m.startswith(f"plan stage={stage} ms=") for m in messages)
     assert any(m.startswith("plan total ms=") for m in messages)
+
+
+def test_the_plan_echoes_the_departure_and_load_it_was_made_for(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    install(monkeypatch)
+
+    body = post(payload(load_lb=55_000)).json()
+
+    assert body["departure"] == iso(DEPARTURE)
+    assert body["load_lb"] == 55_000

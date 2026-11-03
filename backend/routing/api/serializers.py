@@ -3,7 +3,9 @@ from typing import Any
 
 from rest_framework import serializers
 
+from routing.services.geo import Point
 from routing.services.geocoding import Place
+from routing.services.heatmap import Heatmap
 from routing.services.planner import PlannedCheckpoint, PlannedRoute, TripPlan
 
 MAX_LOAD_LB = 80_000
@@ -40,6 +42,8 @@ def plan_response(plan: TripPlan) -> dict[str, Any]:
         "explanation": plan.explanation,
         "warnings": plan.warnings,
         "routes": [_route(route) for route in plan.routes],
+        "departure": _iso(plan.departure_utc),
+        "load_lb": plan.load_lb,
     }
 
 
@@ -93,3 +97,56 @@ def _iso(moment: datetime) -> str:
 
 def _rounded(value: float | None) -> float | None:
     return None if value is None else round(value, 3)
+
+
+MAX_HEATMAP_ROUTES = 3
+MAX_ROUTE_POINTS = 5_000
+
+
+class LineStringSerializer(serializers.Serializer):
+    type = serializers.ChoiceField(choices=["LineString"])
+    coordinates = serializers.ListField(
+        child=serializers.ListField(child=serializers.FloatField(), min_length=2, max_length=2),
+        min_length=2,
+        max_length=MAX_ROUTE_POINTS,
+    )
+
+    def validate_coordinates(self, coordinates: list[list[float]]) -> list[list[float]]:
+        if any(not -180 <= lon <= 180 or not -90 <= lat <= 90 for lon, lat in coordinates):
+            raise serializers.ValidationError("Use [longitude, latitude] pairs on the globe.")
+        return coordinates
+
+
+class RouteGeometrySerializer(serializers.Serializer):
+    id = serializers.CharField(max_length=20)
+    geometry = LineStringSerializer()
+
+
+class HeatmapRequestSerializer(serializers.Serializer):
+    routes = RouteGeometrySerializer(many=True, allow_empty=False, max_length=MAX_HEATMAP_ROUTES)
+    departure = AwareDateTimeField()
+    load_lb = serializers.IntegerField(min_value=1, max_value=MAX_LOAD_LB)
+
+
+def route_lines(routes: list[dict[str, Any]]) -> list[list[Point]]:
+    """The routes' [lon, lat] coordinates as (lat, lon) points."""
+    return [[(lat, lon) for lon, lat in route["geometry"]["coordinates"]] for route in routes]
+
+
+def heatmap_response(heatmap: Heatmap) -> dict[str, Any]:
+    return {
+        "start": _iso(heatmap.start),
+        "hours": heatmap.hours,
+        "step_deg": heatmap.step_deg,
+        "points": [
+            {
+                "lat": point.lat,
+                "lon": point.lon,
+                "risk": point.risk,
+                "wind_mph": point.wind_mph,
+                "rain_in_hr": point.rain_in_hr,
+                "snow_in_hr": point.snow_in_hr,
+            }
+            for point in heatmap.points
+        ],
+    }

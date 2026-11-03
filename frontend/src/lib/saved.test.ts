@@ -66,6 +66,11 @@ describe('last plan', () => {
       'without an explanation',
       JSON.stringify({ savedAt: 'x', plan: { ...makePlan(), explanation: 1 } }),
     ],
+    [
+      'without a departure',
+      JSON.stringify({ savedAt: 'x', plan: { ...makePlan(), departure: 1 } }),
+    ],
+    ['without a load', JSON.stringify({ savedAt: 'x', plan: { ...makePlan(), load_lb: '42000' } })],
     ['without places', JSON.stringify({ savedAt: 'x', plan: { ...makePlan(), origin: null } })],
   ])('is ignored when the saved entry is %s', (_, raw) => {
     sessionStorage.setItem('last-plan', raw)

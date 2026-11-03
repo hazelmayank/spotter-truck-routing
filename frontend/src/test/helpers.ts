@@ -1,5 +1,5 @@
 import { vi } from 'vitest'
-import type { Checkpoint, PlanResponse, Route } from '../types'
+import type { Checkpoint, HeatmapResponse, PlanResponse, Route } from '../types'
 
 export function makeCheckpoint(overrides: Partial<Checkpoint> = {}): Checkpoint {
   return {
@@ -50,6 +50,8 @@ export function makePlan(overrides: Partial<PlanResponse> = {}): PlanResponse {
     explanation: 'Route A is recommended: same weather risk as Route B, but faster.',
     warnings: [],
     routes: [makeRoute()],
+    departure: '2026-11-03T12:00:00Z',
+    load_lb: 42_000,
     ...overrides,
   }
 }
@@ -111,4 +113,23 @@ export function stubFetch(...responses: (Response | Error)[]) {
   })
   vi.stubGlobal('fetch', fetchMock)
   return fetchMock
+}
+
+/** Points at (35, -100) and (36, -101); risk, wind, rain and snow rise by one step per hour. */
+export function makeHeatmapResponse(hours = 49): HeatmapResponse {
+  const series = (scale: number) => Array.from({ length: hours }, (_, hour) => hour * scale)
+  const point = (lat: number, lon: number) => ({
+    lat,
+    lon,
+    risk: Array.from({ length: hours }, (_, hour) => Math.min(4, Math.floor(hour / 10))),
+    wind_mph: series(1),
+    rain_in_hr: series(0.02),
+    snow_in_hr: series(0.05),
+  })
+  return {
+    start: '2026-11-03T12:00:00Z',
+    hours,
+    step_deg: 0.25,
+    points: [point(35, -100), point(36, -101)],
+  }
 }

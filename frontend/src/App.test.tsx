@@ -1,9 +1,16 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, expect, it, vi } from 'vitest'
 import App from './App'
 import { QueryWrapper } from './test/QueryWrapper'
-import { jsonResponse, makePlan, makeThreeRoutePlan, stubFetch } from './test/helpers'
+import {
+  jsonResponse,
+  makeHeatmapResponse,
+  makePlan,
+  makeThreeRoutePlan,
+  stubFetch,
+} from './test/helpers'
+import type { HeatmapResponse } from './types'
 
 // The real map needs WebGL; this stand-in exposes what App passes to it.
 vi.mock('./components/MapView', () => ({
@@ -12,12 +19,16 @@ vi.mock('./components/MapView', () => ({
     hoveredId: string | null
     selectedId: string | null
     checkpoint: { routeId: string; index: number; source: string } | null
+    heatmap?: { features: unknown[] }
+    heatmapStepDeg?: number
   }) => (
     <div
       data-testid="map"
       data-routes={props.plan?.routes.length ?? 0}
       data-hovered={props.hoveredId ?? ''}
       data-selected={props.selectedId ?? ''}
+      data-heatmap={props.heatmap?.features.length ?? ''}
+      data-heatmap-step={props.heatmapStepDeg ?? ''}
       data-checkpoint={
         props.checkpoint
           ? `${props.checkpoint.routeId}:${props.checkpoint.index}:${props.checkpoint.source}`
@@ -27,8 +38,28 @@ vi.mock('./components/MapView', () => ({
   ),
 }))
 
+// The heatmap request is stubbed so the plan tests keep counting only their own requests.
+const heatmapQuery = vi.hoisted(() => ({
+  state: { data: undefined, isLoading: false, error: null } as {
+    data: HeatmapResponse | undefined
+    isLoading: boolean
+    error: Error | null
+  },
+  calls: [] as unknown[][],
+}))
+
+vi.mock('./api/hooks', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./api/hooks')>()),
+  useHeatmap: (...args: unknown[]) => {
+    heatmapQuery.calls.push(args)
+    return heatmapQuery.state
+  },
+}))
+
 afterEach(() => {
   vi.unstubAllGlobals()
+  heatmapQuery.state = { data: undefined, isLoading: false, error: null }
+  heatmapQuery.calls = []
 })
 
 const plan = makeThreeRoutePlan()
@@ -253,4 +284,75 @@ it('starts empty on a first visit', () => {
   expect(screen.getByLabelText('Origin')).toHaveValue('')
   expect(screen.getByText('No trip planned yet')).toBeInTheDocument()
   expect(screen.queryByText(/Showing the plan from/)).not.toBeInTheDocument()
+})
+
+it('shows no heatmap controls before a heatmap exists', () => {
+  renderApp()
+
+  expect(screen.queryByRole('region', { name: 'Weather heatmap' })).not.toBeInTheDocument()
+})
+
+it('asks for the heatmap with the plan routes, departure and load', async () => {
+  stubFetch(jsonResponse({ ...plan, departure: '2026-11-03T15:00:00Z', load_lb: 55_000 }))
+
+  await planSampleTrip()
+
+  await screen.findByRole('heading', { name: 'Route B' })
+  const [routes, departure, load] = heatmapQuery.calls.at(-1)!
+  expect(routes).toHaveLength(3)
+  expect(departure).toBe('2026-11-03T15:00:00Z')
+  expect(load).toBe(55_000)
+})
+
+it('does not ask for a heatmap before there is a plan', () => {
+  renderApp()
+
+  expect(heatmapQuery.calls.at(-1)).toEqual([undefined, '', 0])
+})
+
+it('shows a loading chip while the heatmap loads and keeps the routes usable', async () => {
+  heatmapQuery.state = { data: undefined, isLoading: true, error: null }
+  stubFetch(jsonResponse(plan))
+
+  const user = await planSampleTrip()
+
+  expect(await screen.findByText('Loading weather heatmap…')).toBeInTheDocument()
+  await user.click(await screen.findByRole('button', { name: /^Route A/ }))
+  expect(screen.getByTestId('map')).toHaveAttribute('data-selected', 'A')
+})
+
+it('says when the heatmap could not be loaded, without disturbing the plan', async () => {
+  heatmapQuery.state = { data: undefined, isLoading: false, error: new Error('weather is down') }
+  stubFetch(jsonResponse(plan))
+
+  await planSampleTrip()
+
+  expect(
+    await screen.findByText(/Weather heatmap unavailable: weather is down/),
+  ).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Route B' })).toBeInTheDocument()
+})
+
+it('shows the heatmap controls and gives the map one feature per grid point', async () => {
+  heatmapQuery.state = { data: makeHeatmapResponse(), isLoading: false, error: null }
+  stubFetch(jsonResponse(plan))
+
+  await planSampleTrip()
+
+  expect(await screen.findByRole('region', { name: 'Weather heatmap' })).toBeInTheDocument()
+  expect(screen.getByRole('slider', { name: 'Forecast hour' })).toHaveAttribute('max', '48')
+  await waitFor(() => expect(screen.getByTestId('map')).toHaveAttribute('data-heatmap', '2'))
+  expect(screen.getByTestId('map')).toHaveAttribute('data-heatmap-step', '0.25')
+})
+
+it('moving the slider does not touch the plan results', async () => {
+  heatmapQuery.state = { data: makeHeatmapResponse(), isLoading: false, error: null }
+  stubFetch(jsonResponse(plan))
+  const user = await planSampleTrip()
+  await user.click(await screen.findByRole('button', { name: /^Route A/ }))
+
+  fireEvent.change(screen.getByRole('slider'), { target: { value: '24' } })
+
+  expect(screen.getByTestId('map')).toHaveAttribute('data-selected', 'A')
+  expect(screen.getByRole('button', { name: /^Route A/ })).toHaveAttribute('aria-pressed', 'true')
 })
