@@ -23,7 +23,12 @@ if not SECRET_KEY:
     SECRET_KEY = "insecure-dev-key"
 
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "localhost,127.0.0.1")
-CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:5173")
+# Render sets this to the service's own public hostname, so it can never be left out.
+if render_hostname := os.environ.get("RENDER_EXTERNAL_HOSTNAME"):
+    ALLOWED_HOSTS.append(render_hostname)
+
+# Browsers may call the API only from these origins. Outside DEBUG there is no default.
+CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", "http://localhost:5173" if DEBUG else "")
 
 TOMTOM_API_KEY = os.environ.get("TOMTOM_API_KEY", "")
 

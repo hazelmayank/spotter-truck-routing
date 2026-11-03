@@ -105,3 +105,19 @@ describe('requestHeatmap', () => {
     expect(fetchMock.mock.calls[0][0]).toBe('/api/heatmap')
   })
 })
+
+describe('VITE_API_BASE_URL', () => {
+  it.each(['https://api.example.test', 'https://api.example.test/', 'https://api.example.test///'])(
+    'joins %s and the path with a single slash',
+    async (base) => {
+      vi.stubEnv('VITE_API_BASE_URL', base)
+      vi.resetModules()
+      const fetchMock = stubFetch(jsonResponse(makePlan()))
+
+      const client = await import('./client')
+      await client.requestPlan(request)
+
+      expect(fetchMock.mock.calls[0][0]).toBe('https://api.example.test/api/plan')
+    },
+  )
+})
