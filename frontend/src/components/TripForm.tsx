@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useEffect, useState, type ChangeEvent, type FormEvent } from 'react'
 import {
   INTERVAL_OPTIONS,
   MAX_LOAD_LB,
@@ -9,6 +9,7 @@ import {
   type TripField,
   type TripValues,
 } from '../lib/trip'
+import { loadTripValues, saveTripValues } from '../lib/saved'
 import type { FieldErrors, PlanRequest } from '../types'
 import { Field } from './Field'
 
@@ -23,10 +24,12 @@ const INPUT_CLASS =
 const FIELDS: TripField[] = ['origin', 'destination', 'departure', 'load_lb', 'interval_miles']
 
 export function TripForm({ isPending, serverErrors = {}, onSubmit }: TripFormProps) {
-  const [values, setValues] = useState<TripValues>(() => initialTripValues())
+  const [values, setValues] = useState<TripValues>(() => loadTripValues() ?? initialTripValues())
   const [touched, setTouched] = useState<ReadonlySet<TripField>>(new Set())
   const [submitted, setSubmitted] = useState<TripValues | null>(null)
   const errors = validateTrip(values)
+
+  useEffect(() => saveTripValues(values), [values])
 
   // A server error describes the submitted value, so it goes away once the field is edited.
   const errorFor = (field: TripField) => {

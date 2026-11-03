@@ -80,3 +80,9 @@ export interface HeatmapResponse {
 }
 
 export type FieldErrors = Record<string, string[]>
+
+export interface CheckpointTarget {
+  routeId: string
+  index: number // position in the route's checkpoints array
+  source: 'map' | 'list' // the map only flies to checkpoints picked from the list
+}

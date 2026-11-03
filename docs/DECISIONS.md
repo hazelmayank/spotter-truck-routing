@@ -57,6 +57,19 @@ One line per non-obvious decision.
 - `useHeatmap` sets `staleTime: Infinity` and no retries, so the 49 hours are fetched once per plan and the slider never triggers a request.
 - State stays in `App` (one mutation passed one level down), so no context or store is needed yet.
 
+## Map
+
+- Everything on the map is a GeoJSON source and layer, with no DOM markers, so cost stays flat with hundreds of checkpoints.
+- Each route is its own line layer filtered by route id, so hover and selection only change that layer's paint and never rebuild the data; the GeoJSON is memoized on the plan alone.
+- Routes are drawn worst rank first, so the recommended route is the last layer and sits on top.
+- An invisible 16 px wide line layer carries the hover and click handling, because a 4 px line is hard to hit.
+- Checkpoint features hold only the route id, the checkpoint index and the level; the popup looks the full checkpoint up in the plan, which keeps the map data small (array values in feature properties are also flattened to strings by the map library).
+- Checkpoints of every route are shown, and those of the selected, hovered or else recommended route are larger and fully opaque.
+- Origin and destination are circles that differ by shape (filled dot and ring) and not only by color, because text labels would depend on the style's font files.
+- The fit padding is a uniform 48 px: the sidebar sits beside the map and does not overlap it, so there is no extra sidebar offset.
+- Hover and selection reset when a new plan arrives, by tying them to the plan object instead of clearing them in an effect.
+- The map module is loaded lazily so the form is usable before the map library (about 300 kB gzipped) has downloaded.
+
 ## Risk engine
 
 - Thresholds are half-open: a value exactly on a boundary takes the higher level (wind 25 mph is MODERATE, not LOW).
