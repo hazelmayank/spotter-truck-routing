@@ -5,6 +5,17 @@ testpaths = ["routing/tests"]
 # WhiteNoise warns when collectstatic has not run; irrelevant for tests.
 filterwarnings = ["ignore:No directory at:UserWarning"]
 
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+check_untyped_defs = true
+warn_unused_ignores = true
+# The tests pass fakes where the services expect the real HTTP clients.
+exclude = ["\\.venv", "staticfiles", "routing/tests"]
+
+[tool.django-stubs]
+django_settings_module = "config.settings_test"
+
 [tool.ruff]
 line-length = 100
 target-version = "py312"

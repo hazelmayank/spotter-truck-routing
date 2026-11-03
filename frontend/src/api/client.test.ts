@@ -38,6 +38,7 @@ describe('requestPlan', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(request),
+      signal: expect.any(AbortSignal),
     })
   })
 
@@ -92,6 +93,25 @@ describe('requestPlan', () => {
 
     expect(error.status).toBe(0)
     expect(error.message).toMatch(/Could not reach the server/)
+  })
+
+  it('reports a request that ran out of time with its own message', async () => {
+    // stubFetch only rejects with Error instances, and jsdom's DOMException is not one.
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new DOMException('timed out', 'TimeoutError')))
+
+    const error = await failureOf(requestPlan(request))
+
+    expect(error.status).toBe(0)
+    expect(error.message).toMatch(/took too long/)
+  })
+
+  it('asks the user to wait after a 429', async () => {
+    stubFetch(jsonResponse({ detail: 'Request was throttled.' }, 429))
+
+    const error = await failureOf(requestPlan(request))
+
+    expect(error.status).toBe(429)
+    expect(error.message).toMatch(/Too many requests/)
   })
 })
 

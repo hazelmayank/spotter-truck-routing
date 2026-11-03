@@ -28,6 +28,8 @@ SNOW_IN_HR_BOUNDS: tuple[Bound, ...] = ((0.5, False), (1.0, False), (2.0, False)
 
 WIND_NO_TRAVEL_MPH = 55
 
+MISSING_DATA_REASON = "missing data"
+
 
 class LoadRule(NamedTuple):
     wind_min_mph: float
@@ -82,6 +84,12 @@ def apply_load_rules(level: RiskLevel, wind_mph: float, load_lb: float) -> RiskL
     return level
 
 
+def risk_level(wind_mph: float, rain_in_hr: float, snow_in_hr: float, load_lb: float) -> RiskLevel:
+    """The worst of wind, rain and snow, raised by any load rule."""
+    base_level = max(classify_wind(wind_mph), classify_rain(rain_in_hr), classify_snow(snow_in_hr))
+    return apply_load_rules(base_level, wind_mph, load_lb)
+
+
 def assess_checkpoint(
     wind_mph: float | None,
     rain_in_hr: float | None,
@@ -91,7 +99,7 @@ def assess_checkpoint(
     """Combine wind, rain and snow, then apply load rules. Missing values count as 0."""
     reasons: list[str] = []
     if None in (wind_mph, rain_in_hr, snow_in_hr):
-        reasons.append("missing data")
+        reasons.append(MISSING_DATA_REASON)
     wind = wind_mph or 0.0
     rain = rain_in_hr or 0.0
     snow = snow_in_hr or 0.0
@@ -108,9 +116,8 @@ def assess_checkpoint(
         if factor_level > RiskLevel.LOW:
             reasons.append(f"{name} {value:g} {unit}: {factor_level.label}")
 
-    base_level = max(wind_level, rain_level, snow_level)
-    level = apply_load_rules(base_level, wind, load_lb)
-    if level > base_level:
+    level = risk_level(wind, rain, snow, load_lb)
+    if level > max(wind_level, rain_level, snow_level):
         reasons.append(f"wind {wind:g} mph with {load_lb:,.0f} lb load: {level.label} (load rule)")
 
     return CheckpointRisk(level, wind_level, rain_level, snow_level, reasons)

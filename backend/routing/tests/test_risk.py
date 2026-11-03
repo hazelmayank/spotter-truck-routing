@@ -7,6 +7,7 @@ from routing.services.risk import (
     classify_rain,
     classify_snow,
     classify_wind,
+    risk_level,
 )
 
 LOW, MODERATE, HIGH, SEVERE, NO_TRAVEL = RiskLevel
@@ -104,6 +105,27 @@ def test_load_rules_never_lower_a_level(level: RiskLevel, wind_mph: float, load_
 
 def test_heavy_load_in_40_mph_wind_raises_a_moderate_level_to_severe() -> None:
     assert apply_load_rules(MODERATE, 40, 50000) == SEVERE
+
+
+@pytest.mark.parametrize(
+    ("wind_mph", "rain_in_hr", "snow_in_hr", "load_lb", "expected"),
+    [
+        (10, 0, 0, 20000, LOW),
+        (30, 0.3, 0.6, 20000, HIGH),
+        (10, 0, 2.5, 20000, SEVERE),
+        (40, 0, 0, 50000, SEVERE),
+        (50, 0, 0, 30001, NO_TRAVEL),
+        (55, 0, 0, 0, NO_TRAVEL),
+    ],
+)
+def test_risk_level_is_the_worst_factor_raised_by_load_rules(
+    wind_mph: float, rain_in_hr: float, snow_in_hr: float, load_lb: float, expected: RiskLevel
+) -> None:
+    assert risk_level(wind_mph, rain_in_hr, snow_in_hr, load_lb) == expected
+
+
+def test_assess_checkpoint_level_matches_risk_level() -> None:
+    assert assess_checkpoint(40, 0.3, 0, 50000).level == risk_level(40, 0.3, 0, 50000)
 
 
 def test_assess_checkpoint_all_clear() -> None:

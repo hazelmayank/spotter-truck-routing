@@ -3,14 +3,8 @@ import { setWorkerUrl } from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import MapGL, {
-  Layer,
-  NavigationControl,
-  Popup,
-  Source,
-  type MapLayerMouseEvent,
-  type MapRef,
-} from 'react-map-gl/maplibre'
+import MapGL, { Layer, NavigationControl, Popup, Source, type MapRef } from 'react-map-gl/maplibre'
+import { useMapPointer } from '../hooks/useMapPointer'
 import { DEFAULT_GRID_STEP_DEG } from '../lib/heatmap'
 import {
   CHECKPOINT_HIT_LAYER_ID,
@@ -19,15 +13,15 @@ import {
   EMPTY_COLLECTION,
   ENDPOINT_PAINT,
   ROUTE_HIT_LAYER_ID,
+  checkpointAt,
   checkpointPaint,
   checkpointsGeoJson,
   endpointsGeoJson,
-  isCheckpointLayer,
   planBounds,
   routeLinePaint,
   routesGeoJson,
 } from '../lib/mapData'
-import type { Checkpoint, CheckpointTarget, PlanResponse, Route } from '../types'
+import type { CheckpointTarget, PlanResponse, Route } from '../types'
 import { CheckpointPopup } from './CheckpointPopup'
 import { CheckpointTooltip } from './CheckpointTooltip'
 import { HeatmapLayer } from './HeatmapLayer'
@@ -60,12 +54,6 @@ interface MapViewProps {
   onCheckpoint: (target: CheckpointTarget | null) => void
 }
 
-interface TooltipTarget {
-  plan: PlanResponse
-  routeId: string
-  index: number
-}
-
 export default function MapView({
   plan,
   hoveredId,
@@ -79,8 +67,7 @@ export default function MapView({
 }: MapViewProps) {
   const mapRef = useRef<MapRef>(null)
   const [loaded, setLoaded] = useState(false)
-  const [cursor, setCursor] = useState('')
-  const [tooltipTarget, setTooltipTarget] = useState<TooltipTarget | null>(null)
+  const pointer = useMapPointer({ plan, onHover, onSelect, onCheckpoint })
 
   const routesData = useMemo(() => (plan ? routesGeoJson(plan.routes) : EMPTY_COLLECTION), [plan])
   const checkpointsData = useMemo(
@@ -100,16 +87,9 @@ export default function MapView({
     }
   }, [loaded, bounds])
 
-  const checkpointAt = (
-    target: { routeId: string; index: number } | null,
-  ): Checkpoint | undefined =>
-    target
-      ? plan?.routes.find((route) => route.id === target.routeId)?.checkpoints[target.index]
-      : undefined
-
-  const pinned = checkpointAt(checkpoint)
-  const tooltip = tooltipTarget?.plan === plan ? tooltipTarget : null
-  const tooltipCheckpoint = checkpointAt(tooltip)
+  const pinned = checkpointAt(plan, checkpoint)
+  const { tooltip } = pointer
+  const tooltipCheckpoint = checkpointAt(plan, tooltip)
   const tooltipIsPinned =
     tooltip && checkpoint?.routeId === tooltip.routeId && checkpoint.index === tooltip.index
 
@@ -128,51 +108,6 @@ export default function MapView({
 
   const handleLoad = useCallback(() => setLoaded(true), [])
 
-  const handleClick = useCallback(
-    (event: MapLayerMouseEvent) => {
-      const features = event.features ?? []
-      const checkpointHit = features.find((feature) => isCheckpointLayer(feature.layer.id))
-      if (checkpointHit) {
-        const { routeId, index } = checkpointHit.properties
-        onCheckpoint({ routeId, index, source: 'map' })
-        return
-      }
-      const routeHit = features.find((feature) => feature.layer.id === ROUTE_HIT_LAYER_ID)
-      onSelect(routeHit ? routeHit.properties.id : null)
-      onCheckpoint(null)
-    },
-    [onSelect, onCheckpoint],
-  )
-
-  const handleMouseMove = useCallback(
-    (event: MapLayerMouseEvent) => {
-      const features = event.features ?? []
-      const checkpointHit = features.find((feature) => isCheckpointLayer(feature.layer.id))
-      const routeHit = features.find((feature) => feature.layer.id === ROUTE_HIT_LAYER_ID)
-      setCursor(features.length > 0 ? 'pointer' : '')
-
-      if (plan && checkpointHit) {
-        const { routeId, index } = checkpointHit.properties
-        setTooltipTarget((previous) =>
-          previous?.plan === plan && previous.routeId === routeId && previous.index === index
-            ? previous
-            : { plan, routeId, index },
-        )
-        onHover(null)
-        return
-      }
-      setTooltipTarget(null)
-      onHover(routeHit ? routeHit.properties.id : null)
-    },
-    [plan, onHover],
-  )
-
-  const handleMouseLeave = useCallback(() => {
-    setCursor('')
-    setTooltipTarget(null)
-    onHover(null)
-  }, [onHover])
-
   const closePopup = useCallback(() => onCheckpoint(null), [onCheckpoint])
 
   return (
@@ -182,11 +117,11 @@ export default function MapView({
         initialViewState={INITIAL_VIEW}
         mapStyle={MAP_STYLE}
         interactiveLayerIds={INTERACTIVE_LAYER_IDS}
-        cursor={cursor}
+        cursor={pointer.cursor}
         onLoad={handleLoad}
-        onClick={handleClick}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
+        onClick={pointer.onClick}
+        onMouseMove={pointer.onMouseMove}
+        onMouseLeave={pointer.onMouseLeave}
       >
         <NavigationControl position="top-right" showCompass={false} />
 

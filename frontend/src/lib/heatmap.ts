@@ -13,7 +13,9 @@ interface MetricSpec {
   label: string
   prefix: string // property names are this prefix plus the hour: r0 ... r48
   series: keyof Pick<HeatmapPoint, 'risk' | 'wind_mph' | 'rain_in_hr' | 'snow_in_hr'>
-  max: number // the value drawn at full weight: the no-travel thresholds of the risk model
+  // The value drawn at full weight: the no-travel thresholds of backend/routing/services/risk.py.
+  // They are copied here, so change them together with that file.
+  max: number
   scale: string
 }
 

@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand, CommandError, CommandParser
 
 from routing.services.geocoding import GeocodingError, geocode
 from routing.services.routing import RoutingError, get_routes
@@ -12,12 +12,14 @@ DEFAULT_LOAD_LB = 40_000
 class Command(BaseCommand):
     help = "Call the real TomTom API for a route and print a summary; checks that the key works."
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser: CommandParser) -> None:
         parser.add_argument("origin")
         parser.add_argument("destination")
         parser.add_argument("--load-lb", type=float, default=DEFAULT_LOAD_LB)
 
-    def handle(self, *args, origin, destination, load_lb, **options):
+    def handle(
+        self, *args: object, origin: str, destination: str, load_lb: float, **options: object
+    ) -> None:
         departure_utc = datetime.now(UTC)
         try:
             start, end = geocode(origin), geocode(destination)

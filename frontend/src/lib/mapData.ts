@@ -4,7 +4,7 @@ import type {
   LineLayerSpecification,
 } from 'maplibre-gl'
 import type { FeatureCollection, LineString, Point } from 'geojson'
-import type { PlanResponse, RiskLevel, Route } from '../types'
+import type { Checkpoint, PlanResponse, RiskLevel, Route } from '../types'
 import { RISK_COLORS } from './risk'
 
 export type Bounds = [[west: number, south: number], [east: number, north: number]]
@@ -151,6 +151,14 @@ export const ENDPOINT_PAINT: CircleLayerSpecification['paint'] = {
   'circle-stroke-color': ['match', ['get', 'kind'], 'origin', '#ffffff', '#0f172a'],
   'circle-stroke-width': 4,
 }
+
+export const checkpointAt = (
+  plan: PlanResponse | undefined,
+  target: { routeId: string; index: number } | null,
+): Checkpoint | undefined =>
+  target
+    ? plan?.routes.find((route) => route.id === target.routeId)?.checkpoints[target.index]
+    : undefined
 
 export const isCheckpointLayer = (layerId: string) =>
   layerId === CHECKPOINT_LAYER_ID || layerId === CHECKPOINT_HIT_LAYER_ID

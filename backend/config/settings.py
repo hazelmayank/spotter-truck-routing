@@ -57,6 +57,13 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     "DEFAULT_PERMISSION_CLASSES": [],
     "UNAUTHENTICATED_USER": None,
+    # Every plan or heatmap spends TomTom and Open-Meteo quota, and the API is public.
+    # The counters live in the per-process cache, so each gunicorn worker has its own.
+    "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.AnonRateThrottle"],
+    "DEFAULT_THROTTLE_RATES": {"anon": os.environ.get("API_THROTTLE_RATE", "20/min")},
+    # The client address is the last X-Forwarded-For entry added by the proxy in front of the app
+    # (Caddy); without that header the connection address is used.
+    "NUM_PROXIES": int(os.environ.get("PROXY_COUNT", "1")),
 }
 
 CACHES = {

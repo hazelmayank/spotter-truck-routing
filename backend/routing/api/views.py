@@ -1,7 +1,7 @@
 import logging
 
 from rest_framework import status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, throttle_classes
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -24,6 +24,7 @@ logger = logging.getLogger(__name__)
 
 
 @api_view(["GET"])
+@throttle_classes([])  # the platform's health checks must never be throttled
 def health(request: Request) -> Response:
     return Response({"status": "ok"})
 

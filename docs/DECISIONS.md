@@ -53,7 +53,6 @@ One line per non-obvious decision.
 - The departure input is a `datetime-local` value, read as the browser's local time and converted with `toISOString()` on submit, so the backend always receives UTC.
 - Validation messages appear after a field is blurred or the form is submitted, not while the user is still typing the first time.
 - There is no autocomplete yet because the backend has no `/api/geocode` endpoint; the `suggest` service exists and only needs a thin view.
-- `HeatmapRequest` and `HeatmapResponse` in `types.ts` are a proposed contract, because `/api/heatmap` is not built yet; `useHeatmap` is not mounted in the app until it is.
 - `useHeatmap` sets `staleTime: Infinity` and no retries, so the 49 hours are fetched once per plan and the slider never triggers a request.
 - State stays in `App` (one mutation passed one level down), so no context or store is needed yet.
 
@@ -101,7 +100,13 @@ One line per non-obvious decision.
 - The API runs under gunicorn with two workers, so the weather cache is per worker and each worker may fetch a forecast the other already has.
 - Test and lint tools live in `requirements-dev.txt`, so the deploy build installs only what the service runs.
 - There is no CORS default outside `DEBUG`: the allowed origins must be set, and Render's own hostname is added to the allowed hosts automatically.
-- The blueprint uses predictable service names for the two addresses it needs (`CORS_ALLOWED_ORIGINS`, `VITE_API_BASE_URL`); the README says how to fix them if Render has to rename a service.
+- The blueprint uses a predictable service name for the address `CORS_ALLOWED_ORIGINS` needs, and asks for `VITE_API_BASE_URL` (`sync: false`); the README says how to fix them if Render has to rename a service.
+- Requests are limited to 20 a minute per client address, because every plan or heatmap spends TomTom and Open-Meteo quota and the API is public; `/api/health` is exempt so platform health checks are never refused.
+- The client address is the last `X-Forwarded-For` entry (`PROXY_COUNT` defaults to 1), because Caddy in front of the app appends it and a client cannot forge that entry; behind more proxy layers the count has to be raised.
+- The throttle counters live in the per-process cache, so with two gunicorn workers the effective limit is up to twice the configured rate.
+- The frontend gives up on a request after 90 seconds, longer than a sleeping free-tier API needs to wake, and shows a message of its own instead of waiting forever.
+- `risk_level` in `risk.py` is the one place that combines wind, rain, snow and the load rules, used by both the checkpoint assessment and the heatmap, so the two cannot disagree.
+- `mypy` checks the application code but not the tests, because the tests pass fakes where the services expect the real HTTP clients.
 - The API can run on a server with its own IP address (`deploy/`), because Open-Meteo's free tier limits requests per IP and Render's free instances share outbound IPs, which exhausted the daily limit.
 - Caddy terminates TLS on that server with an `sslip.io` host name, since the HTTPS site cannot call a plain `http` API and a certificate needs a name rather than a bare IP.
 - `VITE_API_BASE_URL` is `sync: false` in the blueprint, so a blueprint sync cannot reset the address to a hardcoded one.

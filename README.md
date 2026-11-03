@@ -35,11 +35,11 @@ To check that your TomTom key works: `python manage.py try_route "Dallas, TX" "D
 ## Tests and checks
 
 ```bash
-cd backend && pytest && ruff check . && ruff format --check .
+cd backend && pytest && ruff check . && ruff format --check . && mypy .
 cd frontend && npm test && npm run lint && npx prettier --check src && npm run build
 ```
 
-No test calls TomTom or Open-Meteo; both are replaced by fakes.
+No test calls TomTom or Open-Meteo; both are replaced by fakes. `pytest --cov=routing` prints backend coverage, and the same checks run on every push in GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)).
 
 ## How it works
 
@@ -57,7 +57,7 @@ The thresholds and every other judgement call are listed, one line each, in [doc
 | `POST /api/plan` | Body: `origin`, `destination`, `departure` (ISO 8601 with a timezone), `load_lb` (1 to 80000), `interval_miles` (10, 25 or 50). Returns the routes, checkpoints, risk summaries, the recommended route and an explanation. |
 | `POST /api/heatmap` | Body: `routes` (id and GeoJSON LineString), `departure`, `load_lb`. Returns hourly risk, wind, rain and snow for a grid along the routes. |
 
-Errors: 400 with field errors, 422 with a message (unknown place, no route, forecast out of range), 502 when TomTom or Open-Meteo fails.
+Errors: 400 with field errors, 422 with a message (unknown place, no route, forecast out of range), 429 when a client sends more than 20 requests a minute, 502 when TomTom or Open-Meteo fails.
 
 ## Configuration
 
@@ -70,6 +70,8 @@ All backend settings come from environment variables (`backend/.env` locally, th
 | `ALLOWED_HOSTS` | Comma-separated host names the API answers to. |
 | `CORS_ALLOWED_ORIGINS` | Comma-separated origins allowed to call the API from a browser. Empty outside `DEBUG`. |
 | `TOMTOM_API_KEY` | TomTom key. It stays on the server; the frontend never sees it. |
+| `API_THROTTLE_RATE` | Requests allowed per client address, for example `20/min` (the default). |
+| `PROXY_COUNT` | Number of proxies in front of the app that add `X-Forwarded-For` (default 1, which is Caddy on the EC2 server). Use 0 when the app is reached directly, and the real count behind a platform with more proxy layers. |
 
 The frontend has one setting, `VITE_API_BASE_URL`, the address of the API. Leave it empty locally.
 
@@ -84,7 +86,7 @@ The repository contains a Render blueprint, [render.yaml](render.yaml), that cre
 3. If Render asks for access to GitHub, click **Connect GitHub**, allow access to this repository, and return to the page.
 4. Find `spotter-truck-routing` in the list and click **Connect**.
 5. Leave the blueprint name as it is and check that the branch is `main`. Render reads `render.yaml` and lists two services: `spotter-truck-routing-api` and `spotter-truck-routing-web`.
-6. Under `spotter-truck-routing-api`, paste your TomTom key into the `TOMTOM_API_KEY` field. This is the only value you have to enter; `SECRET_KEY` is generated for you.
+6. Under `spotter-truck-routing-api`, paste your TomTom key into the `TOMTOM_API_KEY` field. `SECRET_KEY` is generated for you. Under `spotter-truck-routing-web`, enter `https://spotter-truck-routing-api.onrender.com` in `VITE_API_BASE_URL`; the steps below correct it if Render gives the API a different address.
 7. Click **Deploy Blueprint** (older dashboards call it **Apply**).
 8. Wait for both services to show **Live**. The API takes a few minutes to build and the site a little less.
 9. Check the API: open `https://spotter-truck-routing-api.onrender.com/api/health` in a browser. It should show `{"status":"ok"}`.

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
 from .geo import Point, resample
-from .risk import apply_load_rules, classify_rain, classify_snow, classify_wind
+from .risk import risk_level
 from .timing import timed_stage
 from .weather import HourlySeries, OpenMeteoClient, last_forecast_hour
 
@@ -108,8 +108,7 @@ def _heatmap_point(point: Point, series: HourlySeries, load_lb: float) -> Heatma
     for wind, rain, snow in zip(series.wind_mph, series.rain_in_hr, series.snow_in_hr, strict=True):
         # Missing weather counts as calm, like in the checkpoint risk.
         wind, rain, snow = wind or 0.0, rain or 0.0, snow or 0.0
-        base_level = max(classify_wind(wind), classify_rain(rain), classify_snow(snow))
-        risk.append(int(apply_load_rules(base_level, wind, load_lb)))
+        risk.append(int(risk_level(wind, rain, snow, load_lb)))
         wind_mph.append(round(wind, 1))
         rain_in_hr.append(round(rain, 2))
         snow_in_hr.append(round(snow, 2))

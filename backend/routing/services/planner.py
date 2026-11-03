@@ -8,7 +8,7 @@ from datetime import datetime
 
 from .geocoding import Place, geocode
 from .recommend import Candidate, RouteSummary, explain, rank_routes, summarize, warnings_for
-from .risk import CheckpointRisk, assess_checkpoint
+from .risk import MISSING_DATA_REASON, CheckpointRisk, assess_checkpoint
 from .routing import MAX_ROUTES, RouteOption, get_routes
 from .sampling import Checkpoint, build_checkpoints
 from .timing import timed_stage
@@ -16,8 +16,6 @@ from .tomtom import TomTomClient
 from .weather import HourlySeries, HourlyWeather, OpenMeteoClient, weather_at
 
 logger = logging.getLogger(__name__)
-
-MISSING_DATA_REASON = "missing data"
 
 
 @dataclass(frozen=True)
@@ -93,22 +91,8 @@ def plan_trip(request: PlanRequest) -> TripPlan:
         forecasts = _forecasts_by_route(open_meteo, checkpoint_lists, request.departure_utc)
 
     with timed_stage(logger, "plan", "risk"):
-        planned = [
-            _assess_route(checkpoints, forecast, request.load_lb)
-            for checkpoints, forecast in zip(checkpoint_lists, forecasts, strict=True)
-        ]
-        summaries = [_summarize(route_checkpoints) for route_checkpoints in planned]
-        candidates = [
-            Candidate(option.id, summary, option.duration_s)
-            for option, summary in zip(options, summaries, strict=True)
-        ]
-        ranked = rank_routes(candidates)
-        rank_by_id = {candidate.id: rank for rank, candidate in enumerate(ranked, start=1)}
+        routes, ranked = _rank_routes(options, checkpoint_lists, forecasts, request.load_lb)
 
-    routes = [
-        PlannedRoute(option, route_checkpoints, summary, rank_by_id[option.id])
-        for option, route_checkpoints, summary in zip(options, planned, summaries, strict=True)
-    ]
     logger.info(
         "plan total ms=%.0f routes=%d checkpoints=%d",
         (time.perf_counter() - started) * 1000,
@@ -137,6 +121,31 @@ def _forecasts_by_route(
         client.fetch_hourly([(c.lat, c.lon) for c in checkpoints], departure_utc, latest_eta)
     )
     return [[next(series) for _ in route] for route in checkpoint_lists]
+
+
+def _rank_routes(
+    options: list[RouteOption],
+    checkpoint_lists: list[list[Checkpoint]],
+    forecasts: list[list[HourlySeries]],
+    load_lb: float,
+) -> tuple[list[PlannedRoute], list[Candidate]]:
+    """The routes in the order of `options`, and the same routes ranked best first."""
+    planned = [
+        _assess_route(checkpoints, forecast, load_lb)
+        for checkpoints, forecast in zip(checkpoint_lists, forecasts, strict=True)
+    ]
+    summaries = [_summarize(route_checkpoints) for route_checkpoints in planned]
+    candidates = [
+        Candidate(option.id, summary, option.duration_s)
+        for option, summary in zip(options, summaries, strict=True)
+    ]
+    ranked = rank_routes(candidates)
+    rank_by_id = {candidate.id: rank for rank, candidate in enumerate(ranked, start=1)}
+    routes = [
+        PlannedRoute(option, route_checkpoints, summary, rank_by_id[option.id])
+        for option, route_checkpoints, summary in zip(options, planned, summaries, strict=True)
+    ]
+    return routes, ranked
 
 
 def _assess_route(

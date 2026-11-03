@@ -123,7 +123,10 @@ class RouteGeometrySerializer(serializers.Serializer):
 
 
 class HeatmapRequestSerializer(serializers.Serializer):
-    routes = RouteGeometrySerializer(many=True, allow_empty=False, max_length=MAX_HEATMAP_ROUTES)
+    # DRF passes max_length on to the list serializer; the type stubs do not know that.
+    routes = RouteGeometrySerializer(  # type: ignore[call-arg]
+        many=True, allow_empty=False, max_length=MAX_HEATMAP_ROUTES
+    )
     departure = AwareDateTimeField()
     load_lb = serializers.IntegerField(min_value=1, max_value=MAX_LOAD_LB)
 
