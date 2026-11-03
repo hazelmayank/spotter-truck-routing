@@ -75,6 +75,8 @@ The frontend has one setting, `VITE_API_BASE_URL`, the address of the API. Leave
 
 ## Deployment
 
+The live setup runs the React site on Render and the Django API on an AWS EC2 server (see "API on its own server" below), because Open-Meteo's free tier limits requests per IP address and Render's free instances share theirs. The steps in this section deploy both on Render, which works for trying the app but can fail with a 502 once the shared IP's daily weather limit is used up.
+
 The repository contains a Render blueprint, [render.yaml](render.yaml), that creates two services: the Django API (a web service) and the React site (a static site). You need a Render account, this repository on GitHub, and your TomTom API key. Render's labels change now and then, so a button may read a little differently.
 
 1. Open https://dashboard.render.com and sign in.
@@ -107,7 +109,7 @@ Things to know about the free plan:
 
 ### API on its own server (AWS EC2)
 
-This keeps the site on Render and runs the API on an Ubuntu 24.04 server with a fixed IP address of its own, so the Open-Meteo limit counts only this app. [deploy/setup.sh](deploy/setup.sh) installs gunicorn under systemd and Caddy, which gets a free HTTPS certificate. The browser blocks a plain `http` API from an `https` site, so HTTPS is required.
+This keeps the site on Render (from the section above) and runs the API on an Ubuntu 24.04 server with a fixed IP address of its own, so the Open-Meteo limit counts only this app. [deploy/setup.sh](deploy/setup.sh) installs gunicorn under systemd and Caddy, which gets a free HTTPS certificate. The browser blocks a plain `http` API from an `https` site, so HTTPS is required.
 
 1. In the AWS console, pick a region near you and open **EC2**, then **Launch instance**.
 2. Choose the **Ubuntu Server 24.04 LTS** image and the `t3.micro` type (or `t2.micro` if that is the free-tier one in your region).
