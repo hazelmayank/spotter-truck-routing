@@ -58,7 +58,11 @@ export default function App() {
               onCheckpoint={focus.showCheckpoint}
             />
           </Suspense>
-          <HeatmapPanel data={heatmap.data} isLoading={heatmap.isLoading} error={heatmap.error} />
+          <HeatmapPanel
+            forecast={heatmap.data}
+            isLoading={heatmap.isLoading}
+            error={heatmap.error}
+          />
         </main>
       </div>
     </HeatmapControlsProvider>

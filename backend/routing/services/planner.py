@@ -11,7 +11,7 @@ from .recommend import Candidate, RouteSummary, explain, rank_routes, summarize,
 from .risk import MISSING_DATA_REASON, CheckpointRisk, assess_checkpoint
 from .routing import MAX_ROUTES, RouteOption, get_routes
 from .sampling import Checkpoint, build_checkpoints
-from .timing import timed_stage
+from .timing import MS_PER_S, timed_stage
 from .tomtom import TomTomClient
 from .weather import HourlySeries, HourlyWeather, OpenMeteoClient, weather_at
 
@@ -95,7 +95,7 @@ def plan_trip(request: PlanRequest) -> TripPlan:
 
     logger.info(
         "plan total ms=%.0f routes=%d checkpoints=%d",
-        (time.perf_counter() - started) * 1000,
+        (time.perf_counter() - started) * MS_PER_S,
         len(routes),
         sum(len(route.checkpoints) for route in routes),
     )

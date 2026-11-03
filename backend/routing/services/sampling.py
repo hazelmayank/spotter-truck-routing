@@ -22,12 +22,10 @@ class Checkpoint:
 def _elapsed_interpolator(
     time_points: list[TimePoint], total_miles: float
 ) -> Callable[[float], float]:
-    """Return mile -> elapsed seconds, linear between the surrounding time points.
-
-    Offsets are rescaled so the last one lands on the polyline length: the routing service
-    and the geometry measure slightly different distances, and the destination must still
-    get the full travel time.
-    """
+    """Return mile -> elapsed seconds, linear between the surrounding time points."""
+    # Offsets are rescaled so the last one lands on the polyline length: the routing service
+    # and the geometry measure slightly different distances, and the destination must still
+    # get the full travel time.
     points = sorted(time_points)
     last_offset = points[-1][0]
     scale = total_miles / last_offset if last_offset > 0 else 1.0
@@ -53,10 +51,7 @@ def build_checkpoints(
     time_points: list[TimePoint],
     total_seconds: float | None = None,
 ) -> list[Checkpoint]:
-    """Checkpoints every `interval_miles` along `coords`, origin and destination included.
-
-    Without `time_points`, ETAs are proportional to distance over `total_seconds`.
-    """
+    """Checkpoints every `interval_miles` along `coords`, origin and destination included."""
     if len(coords) < 2:
         raise ValueError("at least two coordinates are required")
     if interval_miles <= 0:
@@ -67,6 +62,7 @@ def build_checkpoints(
     cum = cumulative_distances(coords)
     total_miles = cum[-1]
 
+    # Without time points, ETAs are proportional to distance over `total_seconds`.
     if not time_points:
         if total_seconds is None:
             raise ValueError("time_points or total_seconds is required")

@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { makePlan, makeRoute, makeThreeRoutePlan } from '../test/helpers'
+import { makePlan, makeRoute, makeThreeRoutePlan } from '../test/fixtures'
 import type { Route } from '../types'
 import { RecommendationBanner } from './RecommendationBanner'
 

@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { HeatmapStoreContext } from '../hooks/useHeatmapControls'
 import { heatmapGeoJson, heatmapRadius, heatmapWeight } from '../lib/heatmap'
 import { createHeatmapStore, type HeatmapStore } from '../store/heatmapStore'
-import { makeHeatmapResponse } from '../test/helpers'
+import { makeHeatmapResponse } from '../test/fixtures'
 import { HeatmapLayer } from './HeatmapLayer'
 
 interface LayerProps {

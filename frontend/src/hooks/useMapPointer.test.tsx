@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import type { MapLayerMouseEvent } from 'react-map-gl/maplibre'
 import { describe, expect, it, vi } from 'vitest'
 import { CHECKPOINT_LAYER_ID, ROUTE_HIT_LAYER_ID } from '../lib/mapData'
-import { makePlan } from '../test/helpers'
+import { makePlan } from '../test/fixtures'
 import type { PlanResponse } from '../types'
 import { useMapPointer } from './useMapPointer'
 

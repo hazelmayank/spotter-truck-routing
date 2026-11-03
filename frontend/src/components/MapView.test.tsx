@@ -5,7 +5,7 @@ import { HeatmapStoreContext } from '../hooks/useHeatmapControls'
 import { heatmapGeoJson, heatmapRadius, heatmapWeight } from '../lib/heatmap'
 import { LEVEL_COLOR_EXPRESSION, planBounds } from '../lib/mapData'
 import { createHeatmapStore, type HeatmapStore } from '../store/heatmapStore'
-import { makeHeatmapResponse, makePlan, makeThreeRoutePlan } from '../test/helpers'
+import { makeHeatmapResponse, makePlan, makeThreeRoutePlan } from '../test/fixtures'
 import type { CheckpointTarget, PlanResponse } from '../types'
 import MapView from './MapView'
 

@@ -33,16 +33,16 @@ def health(request: Request) -> Response:
 def plan(request: Request) -> Response:
     serializer = PlanRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    data = serializer.validated_data
+    body = serializer.validated_data
 
     try:
         trip = plan_trip(
             PlanRequest(
-                origin=data["origin"],
-                destination=data["destination"],
-                departure_utc=data["departure"],
-                load_lb=data["load_lb"],
-                interval_miles=data["interval_miles"],
+                origin=body["origin"],
+                destination=body["destination"],
+                departure_utc=body["departure"],
+                load_lb=body["load_lb"],
+                interval_miles=body["interval_miles"],
             )
         )
     except (GeocodingError, RoutingError, ForecastRangeError) as exc:
@@ -66,14 +66,14 @@ def _upstream_failure(service: str) -> Response:
 def heatmap(request: Request) -> Response:
     serializer = HeatmapRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
-    data = serializer.validated_data
+    body = serializer.validated_data
 
     try:
-        result = build_heatmap(route_lines(data["routes"]), data["departure"], data["load_lb"])
+        grid = build_heatmap(route_lines(body["routes"]), body["departure"], body["load_lb"])
     except ForecastRangeError as exc:
         return Response({"error": str(exc)}, status=status.HTTP_422_UNPROCESSABLE_ENTITY)
     except WeatherError:
         logger.exception("weather service failed")
         return _upstream_failure("weather")
 
-    return Response(heatmap_response(result))
+    return Response(heatmap_response(grid))

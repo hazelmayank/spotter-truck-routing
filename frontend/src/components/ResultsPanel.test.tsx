@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { ApiError } from '../api/client'
 import { makeFocus } from '../test/focus'
-import { makeThreeRoutePlan } from '../test/helpers'
+import { makeThreeRoutePlan } from '../test/fixtures'
 import { ResultsPanel } from './ResultsPanel'
 
 // Each route card renders exactly one RiskBar, so its renders count the card's renders.

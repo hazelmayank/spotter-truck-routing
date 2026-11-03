@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { QueryWrapper } from '../test/QueryWrapper'
-import { jsonResponse, makePlan, stubFetch } from '../test/helpers'
+import { jsonResponse, makePlan, stubFetch } from '../test/fixtures'
 import type { PlanRequest } from '../types'
 import { ApiError } from './client'
 import { useHeatmap, usePlan } from './hooks'

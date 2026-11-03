@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { makePlan } from '../test/helpers'
+import { makePlan } from '../test/fixtures'
 import type { CheckpointTarget, PlanResponse } from '../types'
 import { useRouteFocus } from './useRouteFocus'
 

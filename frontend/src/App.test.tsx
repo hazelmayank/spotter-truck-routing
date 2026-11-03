@@ -9,7 +9,7 @@ import {
   makePlan,
   makeThreeRoutePlan,
   stubFetch,
-} from './test/helpers'
+} from './test/fixtures'
 import type { HeatmapResponse } from './types'
 
 // The real map needs WebGL; this stand-in exposes what App passes to it.

@@ -46,11 +46,9 @@ class Heatmap:
 
 
 def corridor_grid(lines: list[list[Point]], step_deg: float) -> list[Point]:
-    """Grid points within CORRIDOR_CELLS cells of the lines, south to north then west to east.
-
-    Points sit on exact multiples of `step_deg`, so the weather client's rounding and its
-    cache keys do not move them.
-    """
+    """Grid points within CORRIDOR_CELLS cells of the lines, south to north then west to east."""
+    # Points sit on exact multiples of `step_deg`, so the weather client's rounding and its
+    # cache keys do not move them.
     cells: set[tuple[int, int]] = set()
     for line in lines:
         for lat, lon in resample(line, ROUTE_SAMPLE_MILES):
@@ -77,13 +75,11 @@ def build_heatmap(
     client: OpenMeteoClient | None = None,
     now: datetime | None = None,
 ) -> Heatmap:
-    """Risk, wind, rain and snow for each grid point and hour from the departure hour on.
-
-    The range stops at the forecast horizon when it would run past it; a departure after the
-    horizon (or before today) is rejected by the weather client.
-    """
+    """Risk, wind, rain and snow for each grid point and hour from the departure hour on."""
     now = now or datetime.now(UTC)
     start = departure_utc.astimezone(UTC).replace(minute=0, second=0, microsecond=0)
+    # The range stops at the forecast horizon; a departure past it (or before today) is
+    # rejected by the weather client.
     end = max(start, min(start + timedelta(hours=FORECAST_HOURS), last_forecast_hour(now)))
 
     with timed_stage(logger, "heatmap", "grid"):

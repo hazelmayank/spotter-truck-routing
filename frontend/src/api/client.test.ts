@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { jsonResponse, makePlan, stubFetch } from '../test/helpers'
+import { jsonResponse, makePlan, stubFetch } from '../test/fixtures'
 import type { PlanRequest } from '../types'
 import { ApiError, requestHeatmap, requestPlan } from './client'
 

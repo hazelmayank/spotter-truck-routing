@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { makeCheckpoint } from '../test/helpers'
+import { makeCheckpoint } from '../test/fixtures'
 import { CheckpointList } from './CheckpointList'
 
 const checkpoints = [

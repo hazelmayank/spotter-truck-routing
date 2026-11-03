@@ -13,9 +13,10 @@ interface MetricSpec {
   label: string
   prefix: string // property names are this prefix plus the hour: r0 ... r48
   series: keyof Pick<HeatmapPoint, 'risk' | 'wind_mph' | 'rain_in_hr' | 'snow_in_hr'>
-  // The value drawn at full weight: the no-travel thresholds of backend/routing/services/risk.py.
-  // They are copied here, so change them together with that file.
-  max: number
+  // The values where Moderate, High, Severe and No travel start, from
+  // backend/routing/services/risk.py. They are copied here, so change them together with that
+  // file. The last one is drawn at full weight.
+  thresholds: readonly [number, number, number, number]
   scale: string
 }
 
@@ -24,12 +25,30 @@ export const METRICS: Record<HeatmapMetric, MetricSpec> = {
     label: 'Risk',
     prefix: 'r',
     series: 'risk',
-    max: 4,
+    thresholds: [1, 2, 3, 4],
     scale: 'Risk level 0 to 4; blank where risk is low',
   },
-  wind: { label: 'Wind', prefix: 'w', series: 'wind_mph', max: 55, scale: 'Wind, up to 55 mph' },
-  rain: { label: 'Rain', prefix: 'p', series: 'rain_in_hr', max: 1, scale: 'Rain, up to 1 in/hr' },
-  snow: { label: 'Snow', prefix: 's', series: 'snow_in_hr', max: 3, scale: 'Snow, up to 3 in/hr' },
+  wind: {
+    label: 'Wind',
+    prefix: 'w',
+    series: 'wind_mph',
+    thresholds: [25, 35, 45, 55],
+    scale: 'Wind, up to 55 mph',
+  },
+  rain: {
+    label: 'Rain',
+    prefix: 'p',
+    series: 'rain_in_hr',
+    thresholds: [0.1, 0.25, 0.5, 1],
+    scale: 'Rain, up to 1 in/hr',
+  },
+  snow: {
+    label: 'Snow',
+    prefix: 's',
+    series: 'snow_in_hr',
+    thresholds: [0.5, 1, 2, 3],
+    scale: 'Snow, up to 3 in/hr',
+  },
 }
 
 export const METRIC_ORDER: readonly HeatmapMetric[] = ['risk', 'wind', 'rain', 'snow']
@@ -62,8 +81,9 @@ function hourlyProperties(point: HeatmapPoint, hours: number): HourlyProperties 
 
 /** The point's value at `hour`, scaled to 0-1 and capped; missing values count as 0. */
 export function heatmapWeight(metric: HeatmapMetric, hour: number): ExpressionSpecification {
-  const { prefix, max } = METRICS[metric]
-  return ['min', 1, ['/', ['to-number', ['get', `${prefix}${hour}`], 0], max]]
+  const { prefix, thresholds } = METRICS[metric]
+  const noTravel = thresholds[3]
+  return ['min', 1, ['/', ['to-number', ['get', `${prefix}${hour}`], 0], noTravel]]
 }
 
 // MapLibre draws a point's glow as exp(-4.5 (d / radius)^2): about 1% one radius out. A radius
@@ -101,24 +121,32 @@ export function heatmapRadius(stepDeg: number): ExpressionSpecification {
   ]
 }
 
-// The same green to red to purple ramp as the risk legend, starting fully transparent.
-const HEATMAP_COLOR: ExpressionSpecification = [
-  'interpolate',
-  ['linear'],
-  ['heatmap-density'],
-  0,
-  'rgba(22, 163, 74, 0)',
-  0.2,
-  RISK_COLORS.LOW,
-  0.4,
-  RISK_COLORS.MODERATE,
-  0.6,
-  RISK_COLORS.HIGH,
-  0.8,
-  RISK_COLORS.SEVERE,
-  1,
-  RISK_COLORS.NO_TRAVEL,
-]
+// Density is the weight, so each color stop sits where its level starts: yellow is Moderate,
+// orange High, red Severe and purple No travel for every metric, as in the risk legend. Below
+// Moderate the color fades out, so calm weather is left blank.
+function colorRamp(thresholds: MetricSpec['thresholds']): ExpressionSpecification {
+  const [moderate, high, severe, noTravel] = thresholds
+  return [
+    'interpolate',
+    ['linear'],
+    ['heatmap-density'],
+    0,
+    'rgba(250, 204, 21, 0)', // RISK_COLORS.MODERATE, fully transparent
+    moderate / noTravel,
+    RISK_COLORS.MODERATE,
+    high / noTravel,
+    RISK_COLORS.HIGH,
+    severe / noTravel,
+    RISK_COLORS.SEVERE,
+    1,
+    RISK_COLORS.NO_TRAVEL,
+  ]
+}
+
+// Built once, so the map is handed the same expression object for a metric at every hour.
+const COLOR_RAMPS = Object.fromEntries(
+  METRIC_ORDER.map((metric) => [metric, colorRamp(METRICS[metric].thresholds)]),
+) as Record<HeatmapMetric, ExpressionSpecification>
 
 export const HEATMAP_OPACITY = 0.6
 
@@ -127,18 +155,21 @@ export function heatmapStaticPaint(stepDeg: number): HeatmapLayerSpecification['
   return {
     'heatmap-radius': heatmapRadius(stepDeg),
     'heatmap-intensity': 1,
-    'heatmap-color': HEATMAP_COLOR,
     'heatmap-opacity': HEATMAP_OPACITY,
   }
 }
 
-/** Only `heatmap-weight` depends on the hour and metric; the rest is passed through as is. */
+/** Only `heatmap-weight` depends on the hour; the color ramp changes with the metric alone. */
 export function heatmapPaint(
   metric: HeatmapMetric,
   hour: number,
   staticPaint: HeatmapLayerSpecification['paint'],
 ): HeatmapLayerSpecification['paint'] {
-  return { ...staticPaint, 'heatmap-weight': heatmapWeight(metric, hour) }
+  return {
+    ...staticPaint,
+    'heatmap-color': COLOR_RAMPS[metric],
+    'heatmap-weight': heatmapWeight(metric, hour),
+  }
 }
 
 /** `+12h - Wed 8 PM`: hours after the start, and the local weekday and hour they fall on. */

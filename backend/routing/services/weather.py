@@ -5,6 +5,7 @@ from collections.abc import Sequence
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from http import HTTPStatus
 from math import floor
 from typing import Any
 
@@ -130,12 +131,15 @@ class OpenMeteoClient:
 
 
 def _is_retryable(response: requests.Response) -> bool:
-    return response.status_code == 429 or response.status_code >= 500
+    return (
+        response.status_code == HTTPStatus.TOO_MANY_REQUESTS
+        or response.status_code >= HTTPStatus.INTERNAL_SERVER_ERROR
+    )
 
 
 def _http_error(response: requests.Response) -> str:
     message = f"Open-Meteo returned HTTP {response.status_code}"
-    if response.status_code != 429:
+    if response.status_code != HTTPStatus.TOO_MANY_REQUESTS:
         return message
     # The reason names the exhausted limit (minute, hour or day), which tells whether waiting helps.
     try:

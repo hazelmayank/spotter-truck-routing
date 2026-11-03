@@ -30,11 +30,7 @@ def cumulative_distances(coords: list[Point]) -> list[float]:
 
 
 def interpolate_point(coords: list[Point], cum: list[float], target_miles: float) -> Point:
-    """Point `target_miles` along the line, clamped to its ends.
-
-    Interpolates linearly in lat/lon within a segment, which is accurate for the short
-    segments of a routing polyline.
-    """
+    """Point `target_miles` along the line, clamped to its ends."""
     if target_miles <= 0:
         return coords[0]
     if target_miles >= cum[-1]:
@@ -43,6 +39,7 @@ def interpolate_point(coords: list[Point], cum: list[float], target_miles: float
     i = bisect_right(cum, target_miles) - 1
     segment_miles = cum[i + 1] - cum[i]  # > 0: cum[i] <= target < cum[i + 1]
     fraction = (target_miles - cum[i]) / segment_miles
+    # Linear in lat/lon, which is accurate for the short segments of a routing polyline.
     (lat1, lon1), (lat2, lon2) = coords[i], coords[i + 1]
     return (lat1 + fraction * (lat2 - lat1), lon1 + fraction * (lon2 - lon1))
 
@@ -66,10 +63,8 @@ def resample(coords: list[Point], step_miles: float) -> list[Point]:
 
 
 def shared_fraction(route: list[Point], other: list[Point], radius_miles: float) -> float:
-    """Fraction of `route` points within `radius_miles` of some point of `other`.
-
-    Both lines should be densely sampled (see `resample`) since only points are compared.
-    """
+    """Fraction of `route` points within `radius_miles` of some point of `other`."""
+    # Only points are compared, so both lines should be densely sampled (see `resample`).
     cell_lat = radius_miles / MILES_PER_DEGREE
     # Widest cell in degrees of longitude, so a cell is at least `radius_miles` wide anywhere.
     cell_lon = cell_lat / cos(radians(max(abs(lat) for lat, _ in other)))
@@ -94,10 +89,7 @@ def shared_fraction(route: list[Point], other: list[Point], radius_miles: float)
 
 
 def offset_perpendicular(point: Point, origin: Point, destination: Point, miles: float) -> Point:
-    """`point` moved `miles` sideways from the origin -> destination direction.
-
-    Positive miles go left of the direction of travel, negative miles go right.
-    """
+    """`point` moved `miles` left of the origin -> destination direction; negative goes right."""
     lat, _ = point
     east = (destination[1] - origin[1]) * cos(radians(lat))
     north = destination[0] - origin[0]

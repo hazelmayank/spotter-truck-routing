@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import { makeCheckpoint } from '../test/helpers'
+import { makeCheckpoint } from '../test/fixtures'
 import { CheckpointPopup } from './CheckpointPopup'
 
 describe('CheckpointPopup', () => {

@@ -5,7 +5,7 @@ import type { HeatmapResponse } from '../types'
 import { HeatmapSlider } from './HeatmapSlider'
 
 interface HeatmapPanelProps {
-  data: HeatmapResponse | undefined
+  forecast: HeatmapResponse | undefined
   isLoading: boolean
   error: Error | null
 }
@@ -13,7 +13,7 @@ interface HeatmapPanelProps {
 const CHIP_CLASS = 'w-fit rounded-full bg-white/95 px-3 py-1 text-xs text-slate-700 shadow'
 
 export const HeatmapPanel = memo(function HeatmapPanel({
-  data,
+  forecast,
   isLoading,
   error,
 }: HeatmapPanelProps) {
@@ -35,7 +35,7 @@ export const HeatmapPanel = memo(function HeatmapPanel({
       </div>
     )
   }
-  if (!data) return null
+  if (!forecast) return null
 
   return (
     <section
@@ -43,7 +43,7 @@ export const HeatmapPanel = memo(function HeatmapPanel({
       className="absolute top-3 left-3 flex w-[min(26rem,calc(100%-6rem))] flex-col gap-2 rounded bg-white/95 p-3 shadow"
     >
       <HeatmapOptions />
-      <HeatmapSlider start={data.start} hours={data.hours} />
+      <HeatmapSlider start={forecast.start} hours={forecast.hours} />
     </section>
   )
 })

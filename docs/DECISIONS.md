@@ -81,6 +81,8 @@ One line per non-obvious decision.
 - The slider hour lives in an external store read only by the slider and the heatmap layer, so dragging never re-renders `MapView`, its route and checkpoint layers, or the sidebar.
 - Each slider move causes one frame-throttled paint update with the same GeoJSON object, so only `heatmap-weight` changes and no data is re-sent to the map.
 - Wind, rain and snow weights are scaled to the no-travel thresholds (55 mph, 1 in/hr, 3 in/hr) and risk to 4, each capped at 1, with missing values as 0.
+- Each metric has its own color ramp with the stops at the values where Moderate, High, Severe and No travel start, so yellow, orange, red and purple mean the same level as in the legend; with one shared ramp a Moderate point (weight 0.25) was drawn green.
+- Below Moderate the heatmap fades to transparent instead of green, so calm weather is blank.
 - The heatmap layer is created before the route layers, so it sits below the route lines without a `beforeId`.
 - Checkpoints always show the weather at their own ETA and never use the slider hour, so a checkpoint's color cannot change while the slider is scrubbed.
 - Moving the slider by hand pauses playback, and Play stops at the last hour and restarts from +0h if pressed there.

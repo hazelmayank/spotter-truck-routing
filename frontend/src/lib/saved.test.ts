@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { makePlan } from '../test/helpers'
+import { makePlan } from '../test/fixtures'
 import { loadLastPlan, loadTripValues, saveLastPlan, saveTripValues } from './saved'
 import type { TripValues } from './trip'
 

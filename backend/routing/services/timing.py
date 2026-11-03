@@ -3,6 +3,8 @@ import time
 from collections.abc import Iterator
 from contextlib import contextmanager
 
+MS_PER_S = 1000
+
 
 @contextmanager
 def timed_stage(logger: logging.Logger, label: str, stage: str) -> Iterator[None]:
@@ -11,4 +13,5 @@ def timed_stage(logger: logging.Logger, label: str, stage: str) -> Iterator[None
     try:
         yield
     finally:
-        logger.info("%s stage=%s ms=%.0f", label, stage, (time.perf_counter() - started) * 1000)
+        elapsed_ms = (time.perf_counter() - started) * MS_PER_S
+        logger.info("%s stage=%s ms=%.0f", label, stage, elapsed_ms)

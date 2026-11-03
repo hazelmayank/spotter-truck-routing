@@ -2,14 +2,14 @@ import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 import { HeatmapStoreContext } from '../hooks/useHeatmapControls'
 import { createHeatmapStore } from '../store/heatmapStore'
-import { makeHeatmapResponse } from '../test/helpers'
+import { makeHeatmapResponse } from '../test/fixtures'
 import { HeatmapPanel } from './HeatmapPanel'
 
 function setup(props: Partial<Parameters<typeof HeatmapPanel>[0]> = {}) {
   const store = createHeatmapStore()
   const { container } = render(
     <HeatmapStoreContext value={store}>
-      <HeatmapPanel data={makeHeatmapResponse()} isLoading={false} error={null} {...props} />
+      <HeatmapPanel forecast={makeHeatmapResponse()} isLoading={false} error={null} {...props} />
     </HeatmapStoreContext>,
   )
   return { store, container }
@@ -17,7 +17,7 @@ function setup(props: Partial<Parameters<typeof HeatmapPanel>[0]> = {}) {
 
 describe('while the heatmap loads', () => {
   it('shows a small chip and nothing else', () => {
-    setup({ data: undefined, isLoading: true })
+    setup({ forecast: undefined, isLoading: true })
 
     expect(screen.getByRole('status')).toHaveTextContent('Loading weather heatmap…')
     expect(screen.queryByRole('slider')).not.toBeInTheDocument()
@@ -28,7 +28,7 @@ describe('while the heatmap loads', () => {
 describe('when the heatmap fails', () => {
   it('says so with the reason, as a chip', () => {
     setup({
-      data: undefined,
+      forecast: undefined,
       error: new Error('The weather service is not responding. Please try again in a moment.'),
     })
 
@@ -41,7 +41,7 @@ describe('when the heatmap fails', () => {
 
 describe('before there is a plan', () => {
   it('shows nothing', () => {
-    const { container } = setup({ data: undefined })
+    const { container } = setup({ forecast: undefined })
 
     expect(container).toBeEmptyDOMElement()
   })
@@ -72,7 +72,7 @@ describe('with a heatmap', () => {
   })
 
   it('gives the slider as many hours as the heatmap has', () => {
-    setup({ data: makeHeatmapResponse(11) })
+    setup({ forecast: makeHeatmapResponse(11) })
 
     expect(screen.getByRole('slider')).toHaveAttribute('max', '10')
   })

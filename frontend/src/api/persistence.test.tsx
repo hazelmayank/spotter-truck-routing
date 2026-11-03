@@ -2,7 +2,7 @@ import { renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { loadLastPlan, saveLastPlan } from '../lib/saved'
 import { QueryWrapper } from '../test/QueryWrapper'
-import { jsonResponse, makePlan, makeThreeRoutePlan, stubFetch } from '../test/helpers'
+import { jsonResponse, makePlan, makeThreeRoutePlan, stubFetch } from '../test/fixtures'
 import type { PlanRequest } from '../types'
 import { usePlan, useRestoredPlan } from './hooks'
 

@@ -54,7 +54,7 @@ export const TripForm = memo(function TripForm({
     onBlur: () => setTouched(new Set(touched).add(field)),
   })
 
-  const handleSubmit = (event: FormEvent) => {
+  const submit = (event: FormEvent) => {
     event.preventDefault()
     setTouched(new Set(FIELDS))
     if (Object.keys(errors).length > 0) return
@@ -63,7 +63,7 @@ export const TripForm = memo(function TripForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-3">
+    <form onSubmit={submit} noValidate className="flex flex-col gap-3">
       <Field id="origin" label="Origin" error={errorFor('origin')}>
         <input {...inputProps('origin')} type="text" autoComplete="off" />
       </Field>

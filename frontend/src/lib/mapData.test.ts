@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { makePlan, makeRoute, makeThreeRoutePlan } from '../test/helpers'
+import { makePlan, makeRoute, makeThreeRoutePlan } from '../test/fixtures'
 import {
   ENDPOINT_PAINT,
   LEVEL_COLOR_EXPRESSION,

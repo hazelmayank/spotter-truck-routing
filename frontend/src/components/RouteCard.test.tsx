@@ -1,7 +1,7 @@
 import { render, screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
-import { makeRoute, makeThreeRoutePlan } from '../test/helpers'
+import { makeRoute, makeThreeRoutePlan } from '../test/fixtures'
 import type { Route } from '../types'
 import { RouteCard } from './RouteCard'
 

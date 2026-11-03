@@ -11,6 +11,10 @@ from routing.services.planner import PlannedCheckpoint, PlannedRoute, TripPlan
 MAX_LOAD_LB = 80_000
 INTERVAL_CHOICES = (10, 25, 50)
 DEFAULT_INTERVAL_MILES = 25
+MAX_PLACE_LENGTH = 200
+MAX_ROUTE_ID_LENGTH = 20
+MAX_LATITUDE = 90
+MAX_LONGITUDE = 180
 
 
 class AwareDateTimeField(serializers.DateTimeField):
@@ -25,8 +29,8 @@ class AwareDateTimeField(serializers.DateTimeField):
 
 
 class PlanRequestSerializer(serializers.Serializer):
-    origin = serializers.CharField(max_length=200)
-    destination = serializers.CharField(max_length=200)
+    origin = serializers.CharField(max_length=MAX_PLACE_LENGTH)
+    destination = serializers.CharField(max_length=MAX_PLACE_LENGTH)
     departure = AwareDateTimeField()
     load_lb = serializers.IntegerField(min_value=1, max_value=MAX_LOAD_LB)
     interval_miles = serializers.ChoiceField(
@@ -112,13 +116,13 @@ class LineStringSerializer(serializers.Serializer):
     )
 
     def validate_coordinates(self, coordinates: list[list[float]]) -> list[list[float]]:
-        if any(not -180 <= lon <= 180 or not -90 <= lat <= 90 for lon, lat in coordinates):
+        if any(abs(lon) > MAX_LONGITUDE or abs(lat) > MAX_LATITUDE for lon, lat in coordinates):
             raise serializers.ValidationError("Use [longitude, latitude] pairs on the globe.")
         return coordinates
 
 
 class RouteGeometrySerializer(serializers.Serializer):
-    id = serializers.CharField(max_length=20)
+    id = serializers.CharField(max_length=MAX_ROUTE_ID_LENGTH)
     geometry = LineStringSerializer()
 
 

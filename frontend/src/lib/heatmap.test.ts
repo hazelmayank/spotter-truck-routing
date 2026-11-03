@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { makeHeatmapResponse } from '../test/helpers'
+import { makeHeatmapResponse } from '../test/fixtures'
+import type { HeatmapMetric } from '../types'
 import {
   HEATMAP_OPACITY,
   METRIC_ORDER,
@@ -71,11 +72,13 @@ describe('metrics', () => {
     expect(METRIC_ORDER).toEqual(['risk', 'wind', 'rain', 'snow'])
   })
 
-  it('scales each metric to its no-travel threshold', () => {
-    expect(METRICS.risk.max).toBe(4)
-    expect(METRICS.wind.max).toBe(55)
-    expect(METRICS.rain.max).toBe(1)
-    expect(METRICS.snow.max).toBe(3)
+  it.each([
+    ['risk', [1, 2, 3, 4]],
+    ['wind', [25, 35, 45, 55]],
+    ['rain', [0.1, 0.25, 0.5, 1]],
+    ['snow', [0.5, 1, 2, 3]],
+  ] as const)('starts the %s levels at the thresholds of the risk model', (metric, thresholds) => {
+    expect(METRICS[metric].thresholds).toEqual(thresholds)
   })
 
   it('has a distinct property prefix per metric', () => {
@@ -140,25 +143,63 @@ describe('heatmapPaint', () => {
     expect(second['heatmap-weight']).not.toEqual(first['heatmap-weight'])
   })
 
-  it('colors the density with the risk legend ramp, from transparent green to purple', () => {
-    const ramp = staticPaint?.['heatmap-color'] as unknown[]
+  it('keeps the same color ramp object for a metric at every hour', () => {
+    expect(heatmapPaint('wind', 1, staticPaint)?.['heatmap-color']).toBe(
+      heatmapPaint('wind', 30, staticPaint)?.['heatmap-color'],
+    )
+  })
+})
 
+describe('color ramp', () => {
+  const rampOf = (metric: HeatmapMetric) => {
+    const ramp = heatmapPaint(metric, 0, heatmapStaticPaint(0.25))?.['heatmap-color'] as unknown[]
     expect(ramp.slice(0, 3)).toEqual(['interpolate', ['linear'], ['heatmap-density']])
     const stops = ramp.slice(3)
-    expect(stops[0]).toBe(0)
-    expect(stops[1]).toBe('rgba(22, 163, 74, 0)')
-    expect(stops.filter((_, index) => index % 2 === 1).slice(1)).toEqual([
-      RISK_COLORS.LOW,
-      RISK_COLORS.MODERATE,
-      RISK_COLORS.HIGH,
-      RISK_COLORS.SEVERE,
-      RISK_COLORS.NO_TRAVEL,
+    return {
+      start: [stops[0], stops[1]],
+      levels: [2, 4, 6, 8].map((index) => [stops[index], stops[index + 1]]),
+    }
+  }
+
+  it('starts fully transparent in the Moderate yellow, so calm weather is blank', () => {
+    expect(rampOf('risk').start).toEqual([0, 'rgba(250, 204, 21, 0)'])
+    expect(RISK_COLORS.MODERATE).toBe('#facc15') // rgb(250, 204, 21)
+  })
+
+  it('puts each risk level at its own density, so a color means the same as in the legend', () => {
+    expect(rampOf('risk').levels).toEqual([
+      [0.25, RISK_COLORS.MODERATE],
+      [0.5, RISK_COLORS.HIGH],
+      [0.75, RISK_COLORS.SEVERE],
+      [1, RISK_COLORS.NO_TRAVEL],
     ])
   })
 
-  it('starts the ramp from the same green as the LOW level', () => {
-    expect(RISK_COLORS.LOW).toBe('#16a34a') // rgb(22, 163, 74)
+  it('puts wind levels where the risk model starts them', () => {
+    const densities = rampOf('wind').levels.map(([density]) => density)
+
+    expect(densities[0]).toBeCloseTo(25 / 55)
+    expect(densities[1]).toBeCloseTo(35 / 55)
+    expect(densities[2]).toBeCloseTo(45 / 55)
+    expect(densities[3]).toBe(1)
   })
+
+  it.each(['risk', 'wind', 'rain', 'snow'] as const)(
+    'has increasing stops from yellow to purple for %s',
+    (metric) => {
+      const { levels } = rampOf(metric)
+      const densities = levels.map(([density]) => density as number)
+
+      expect(densities).toEqual([...densities].sort((a, b) => a - b))
+      expect(densities[0]).toBeGreaterThan(0)
+      expect(levels.map(([, color]) => color)).toEqual([
+        RISK_COLORS.MODERATE,
+        RISK_COLORS.HIGH,
+        RISK_COLORS.SEVERE,
+        RISK_COLORS.NO_TRAVEL,
+      ])
+    },
+  )
 })
 
 describe('heatmapRadius', () => {

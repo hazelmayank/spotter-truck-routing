@@ -106,7 +106,7 @@ export default function MapView({
 
   const activeRouteId = selectedId ?? hoveredId ?? plan?.recommended_route_id ?? ''
 
-  const handleLoad = useCallback(() => setLoaded(true), [])
+  const markLoaded = useCallback(() => setLoaded(true), [])
 
   const closePopup = useCallback(() => onCheckpoint(null), [onCheckpoint])
 
@@ -118,7 +118,7 @@ export default function MapView({
         mapStyle={MAP_STYLE}
         interactiveLayerIds={INTERACTIVE_LAYER_IDS}
         cursor={pointer.cursor}
-        onLoad={handleLoad}
+        onLoad={markLoaded}
         onClick={pointer.onClick}
         onMouseMove={pointer.onMouseMove}
         onMouseLeave={pointer.onMouseLeave}
