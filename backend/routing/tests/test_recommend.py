@@ -149,7 +149,20 @@ def test_explain_for_average_risk() -> None:
     ranked = rank_routes([candidate("A", avg_risk=0.9), candidate("B", avg_risk=0.4)])
 
     assert explain(ranked).startswith(
-        "Route B is recommended: lower average risk (0.40 versus 0.90 on Route A)."
+        "Route B is recommended: lower average risk (0.400 versus 0.900 on Route A)."
+    )
+
+
+def test_explain_shows_averages_that_differ_only_in_the_third_decimal() -> None:
+    ranked = rank_routes(
+        [
+            candidate("A", avg_risk=0.062, duration_s=100),
+            candidate("C", avg_risk=0.058, duration_s=900),
+        ]
+    )
+
+    assert explain(ranked).startswith(
+        "Route C is recommended: lower average risk (0.058 versus 0.062 on Route A)."
     )
 
 

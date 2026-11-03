@@ -5,6 +5,9 @@ import { CheckpointList } from './CheckpointList'
 import { LevelBadge } from './LevelBadge'
 import { RiskBar } from './RiskBar'
 
+// The decimals the backend ranks routes by, so close routes do not read as equal.
+const AVG_RISK_DECIMALS = 3
+
 interface RouteCardProps {
   route: Route
   recommended: boolean
@@ -66,7 +69,7 @@ export const RouteCard = memo(function RouteCard({
           {miles.NO_TRAVEL > 0 && ` · No travel ${formatMiles(miles.NO_TRAVEL)}`}
         </span>
         <span className="flex items-center justify-between text-xs text-slate-700">
-          <span>Average risk {avg_risk.toFixed(2)}</span>
+          <span>Average risk {avg_risk.toFixed(AVG_RISK_DECIMALS)}</span>
           <span className="flex items-center gap-1.5">
             Max <LevelBadge level={max_level} />
           </span>

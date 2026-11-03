@@ -91,9 +91,10 @@ def _deciding_reason(best: Candidate, runner_up: Candidate) -> str:
                 f"versus {other_miles:.1f} mi on Route {runner_up.id}"
             )
     if best.summary.avg_risk != runner_up.summary.avg_risk:
+        # The same decimals as the ranking compares, so two close routes never read as equal.
         return (
-            f"lower average risk ({best.summary.avg_risk:.2f} versus "
-            f"{runner_up.summary.avg_risk:.2f} on Route {runner_up.id})"
+            f"lower average risk ({best.summary.avg_risk:.{AVG_RISK_DECIMALS}f} versus "
+            f"{runner_up.summary.avg_risk:.{AVG_RISK_DECIMALS}f} on Route {runner_up.id})"
         )
     if best.duration_s < runner_up.duration_s:
         return f"same weather risk as Route {runner_up.id}, but faster"

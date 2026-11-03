@@ -83,7 +83,7 @@ describe('RouteCard summary', () => {
   it('shows the average risk and the highest level', () => {
     setup()
 
-    expect(card()).toHaveTextContent('Average risk 0.36')
+    expect(card()).toHaveTextContent('Average risk 0.360')
     expect(card()).toHaveTextContent('Max Severe')
   })
 
