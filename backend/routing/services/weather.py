@@ -21,7 +21,7 @@ FORECAST_DAYS = 16
 MAX_POINTS_PER_REQUEST = 100
 MAX_WORKERS = 4
 TIMEOUT_S = 15
-RETRY_BACKOFF_S = 0.5
+RETRY_BACKOFFS_S = (1.0, 3.0, 8.0)
 COORD_DECIMALS = 2
 CACHE_TTL_S = 30 * 60
 
@@ -113,11 +113,13 @@ class OpenMeteoClient:
 
     def _get(self, params: dict[str, Any]) -> Any:
         response = self._request(params)
-        if response.status_code == 429 or response.status_code >= 500:
-            time.sleep(RETRY_BACKOFF_S)
+        for backoff_s in RETRY_BACKOFFS_S:
+            if not _is_retryable(response):
+                break
+            time.sleep(backoff_s)
             response = self._request(params)
         if not response.ok:
-            raise WeatherError(f"Open-Meteo returned HTTP {response.status_code}")
+            raise WeatherError(_http_error(response))
         return response.json()
 
     def _request(self, params: dict[str, Any]) -> requests.Response:
@@ -125,6 +127,22 @@ class OpenMeteoClient:
             return self._session.get(FORECAST_URL, params=params, timeout=TIMEOUT_S)
         except requests.RequestException as exc:
             raise WeatherError(f"Open-Meteo request failed: {type(exc).__name__}") from exc
+
+
+def _is_retryable(response: requests.Response) -> bool:
+    return response.status_code == 429 or response.status_code >= 500
+
+
+def _http_error(response: requests.Response) -> str:
+    message = f"Open-Meteo returned HTTP {response.status_code}"
+    if response.status_code != 429:
+        return message
+    # The reason names the exhausted limit (minute, hour or day), which tells whether waiting helps.
+    try:
+        reason = response.json().get("reason")
+    except ValueError:
+        return message
+    return f"{message}: {reason}" if reason else message
 
 
 def weather_at(series: HourlySeries, eta_utc: datetime) -> HourlyWeather:

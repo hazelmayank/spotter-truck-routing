@@ -32,7 +32,7 @@ One line per non-obvious decision.
 - `weather_at` rounds exactly half past the hour up, and raises `ForecastRangeError` for an ETA more than half an hour outside the series instead of silently reusing the edge hour.
 - The forecast horizon is from 00:00 UTC today to 16 days after that; a window that leaves it is rejected before any request is made.
 - Results are cached per point and hour range for 30 minutes in Django's local-memory cache, which is per process, so each gunicorn worker has its own copy.
-- Batches of up to 100 points run on at most 4 threads; a 429 or 5xx response is retried once after 0.5 s, other errors are not retried.
+- Batches of up to 100 points run on at most 4 threads; a 429 or 5xx response is retried up to 3 times after 1, 3 and 8 s (Render's shared outbound IPs often hit Open-Meteo's free-tier limit), and a 429 error carries Open-Meteo's reason so the log says which limit was hit; other errors are not retried.
 
 ## Recommendation and plan API
 

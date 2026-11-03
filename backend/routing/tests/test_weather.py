@@ -205,7 +205,7 @@ def forecast_body() -> dict[str, Any]:
 
 
 @pytest.mark.parametrize("status", [429, 500, 503])
-def test_retries_once_on_rate_limit_and_server_errors(
+def test_retries_on_rate_limit_and_server_errors(
     status: int, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     sleeps = []
@@ -216,18 +216,29 @@ def test_retries_once_on_rate_limit_and_server_errors(
     series = fetch([(32.78, -96.8)], session)
 
     assert len(session.requests) == 2
-    assert len(sleeps) == 1
+    assert sleeps == [1.0]
     assert series[0].wind_mph[0] == 32.78
 
 
-def test_gives_up_after_one_retry(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(weather.time, "sleep", lambda seconds: None)
+def test_gives_up_after_three_retries_with_growing_waits(monkeypatch: pytest.MonkeyPatch) -> None:
+    sleeps = []
+    monkeypatch.setattr(weather.time, "sleep", sleeps.append)
     session = FakeSession(FakeResponse(503))
 
     with pytest.raises(WeatherError, match="HTTP 503"):
         fetch([(32.78, -96.8)], session)
 
-    assert len(session.requests) == 2
+    assert len(session.requests) == 4
+    assert sleeps == [1.0, 3.0, 8.0]
+
+
+def test_rate_limit_error_includes_the_reason(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(weather.time, "sleep", lambda seconds: None)
+    reason = "Hourly API request limit exceeded"
+    session = FakeSession(FakeResponse(429, {"error": True, "reason": reason}))
+
+    with pytest.raises(WeatherError, match=reason):
+        fetch([(32.78, -96.8)], session)
 
 
 def test_client_errors_are_not_retried(monkeypatch: pytest.MonkeyPatch) -> None:
